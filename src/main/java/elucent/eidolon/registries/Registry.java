@@ -10,10 +10,7 @@ import elucent.eidolon.common.item.*;
 import elucent.eidolon.common.item.curio.*;
 import elucent.eidolon.common.tile.*;
 import elucent.eidolon.common.world.EidolonAbstractTreeFeature;
-import elucent.eidolon.gui.ResearchTableContainer;
-import elucent.eidolon.gui.SoulEnchanterContainer;
-import elucent.eidolon.gui.WoodenBrewingStandContainer;
-import elucent.eidolon.gui.WorktableContainer;
+import elucent.eidolon.gui.*;
 import elucent.eidolon.util.DamageTypeData;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -496,7 +493,8 @@ public class Registry {
             WOODEN_STAND_CONTAINER = addContainer("wooden_brewing_stand", WoodenBrewingStandContainer::new);
     public static final RegistryObject<MenuType<ResearchTableContainer>>
             RESEARCH_TABLE_CONTAINER = addContainer("research_table", ResearchTableContainer::new);
-
+    public static final RegistryObject<MenuType<ScriptoriumContainer>>
+            SCRIPTORIUM_CONTAINER = addContainer("scriptorium", ScriptoriumContainer::new);
 
     public static void init() {
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();

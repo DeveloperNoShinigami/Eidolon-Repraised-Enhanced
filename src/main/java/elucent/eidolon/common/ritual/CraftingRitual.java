@@ -5,6 +5,7 @@ import elucent.eidolon.api.ritual.Ritual;
 import elucent.eidolon.common.tile.BrazierTileEntity;
 import elucent.eidolon.util.ColorUtil;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
@@ -22,6 +23,11 @@ public class CraftingRitual extends Ritual {
         super(symbol, color);
         this.result = result;
         this.keepNbtOfReagent = keepNBT;
+    }
+
+    @Override
+    public Component getName() {
+        return Component.translatable("eidolon.ritual.crafting", result.getDisplayName());
     }
 
     @Override

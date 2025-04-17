@@ -20,6 +20,9 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.common.util.LazyOptional;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @SuppressWarnings("OptionalGetWithoutIsPresent")
 public class KnowledgeUtil {
     public static void grantSign(Entity entity, Sign sign) {
@@ -76,6 +79,15 @@ public class KnowledgeUtil {
             player.connection.send(new ClientboundSetActionBarTextPacket(Component.translatable("eidolon.title.new_rune", Component.translatable(rune.getRegistryName().getNamespace() + ".rune." + rune.getRegistryName().getPath()))));
             Networking.sendTo(player, new KnowledgeUpdatePacket(player, true));
         });
+    }
+
+    public static List<Sign> getKnownSigns(Player player) {
+        List<Sign> list = new ArrayList<>();
+        if (player.getCapability(IKnowledge.INSTANCE).isPresent()) {
+            var cap = player.getCapability(IKnowledge.INSTANCE).resolve().get();
+            list.addAll(cap.getKnownSigns());
+        }
+        return list;
     }
 
     public static boolean knowsSign(Player player, Sign sign) {

@@ -8,10 +8,7 @@ import elucent.eidolon.common.item.AthameItem;
 import elucent.eidolon.common.tile.*;
 import elucent.eidolon.compat.CompatHandler;
 import elucent.eidolon.event.Events;
-import elucent.eidolon.gui.ResearchTableScreen;
-import elucent.eidolon.gui.SoulEnchanterScreen;
-import elucent.eidolon.gui.WoodenBrewingStandScreen;
-import elucent.eidolon.gui.WorktableScreen;
+import elucent.eidolon.gui.*;
 import elucent.eidolon.mixin.BlockEntityTypeAccessor;
 import elucent.eidolon.network.Networking;
 import elucent.eidolon.proxy.ClientProxy;
@@ -157,6 +154,7 @@ public class Eidolon {
             MenuScreens.register(Registry.SOUL_ENCHANTER_CONTAINER.get(), SoulEnchanterScreen::new);
             MenuScreens.register(Registry.WOODEN_STAND_CONTAINER.get(), WoodenBrewingStandScreen::new);
             MenuScreens.register(Registry.RESEARCH_TABLE_CONTAINER.get(), ResearchTableScreen::new);
+            MenuScreens.register(Registry.SCRIPTORIUM_CONTAINER.get(), ScriptoriumScreen::new);
 
             ClientRegistry.initCurios();
 

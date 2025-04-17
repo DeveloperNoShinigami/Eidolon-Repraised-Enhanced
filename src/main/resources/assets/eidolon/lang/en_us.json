@@ -822,5 +822,17 @@
   "magenta": "Magenta",
   "light_blue": "Light Blue",
   "light_gray": "Light Gray",
-  "eidolon.gui.scriptorium": "Scriptorium"
+  "eidolon.gui.scriptorium": "Scriptorium",
+  "eidolon.ritual.crystallization": "Crystallization",
+  "eidolon.ritual.summon": "Summon: %s",
+  "eidolon.ritual.daylight": "Daylight",
+  "eidolon.ritual.moonlight": "Nightfall",
+  "eidolon.ritual.crafting": "Crafting: %s",
+  "eidolon.ritual.allure": "Alluring",
+  "eidolon.ritual.repelling": "Repelling",
+  "eidolon.ritual.absorption": "Absorption",
+  "eidolon.ritual.deceit": "Deceit",
+  "eidolon.ritual.purify": "Purification",
+  "eidolon.ritual.recharging_soulfire": "Recharging Soulfire",
+  "eidolon.ritual.recharging_chill": "Recharging Bonechill"
 }

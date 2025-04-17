@@ -44,12 +44,7 @@ public abstract class Page {
         if (ingredient.isEmpty()) return;
         ItemStack[] items = ingredient.getItems();
         ItemStack stack = items[((int) Eidolon.proxy.getWorld().getGameTime() / 20) % items.length];
-        guiGraphics.renderItem(stack, x, y);
-        var font = Minecraft.getInstance().font;
-        guiGraphics.renderItemDecorations(font, stack, x, y, null);
-        if (mouseX >= x && mouseY >= y && mouseX <= x + 16 && mouseY <= y + 16) {
-            guiGraphics.renderTooltip(font, stack, mouseX, mouseY);
-        }
+        drawItem(guiGraphics, stack, x, y, mouseX, mouseY);
     }
 
     @OnlyIn(Dist.CLIENT)
@@ -107,7 +102,7 @@ public abstract class Page {
     }
 
     @OnlyIn(Dist.CLIENT)
-    static void colorBlit(PoseStack mStack, int x, int y, int uOffset, int vOffset, int width, int height, int textureWidth, int textureHeight, int color) {
+    public static void colorBlit(PoseStack mStack, int x, int y, int uOffset, int vOffset, int width, int height, int textureWidth, int textureHeight, int color) {
         Matrix4f matrix = mStack.last().pose();
         int maxX = x + width, maxY = y + height;
         float minU = (float) uOffset / textureWidth, minV = (float) vOffset / textureHeight;
