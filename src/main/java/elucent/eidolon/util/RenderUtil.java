@@ -9,7 +9,6 @@ import com.mojang.blaze3d.vertex.VertexFormat.Mode;
 import com.mojang.math.Axis;
 import elucent.eidolon.Eidolon;
 import elucent.eidolon.client.ClientRegistry;
-import elucent.eidolon.event.ClientEvents;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -132,8 +131,6 @@ public class RenderUtil {
                     .createCompositeState(false)
     );
 
-    static double ticks = 0;
-
     public static void litQuad(PoseStack mStack, MultiBufferSource buffer, double x, double y, double w, double h, float r, float g, float b, float a, TextureAtlasSprite sprite) {
         VertexConsumer builder = buffer.getBuffer(GLOWING_SPRITE);
 
@@ -195,13 +192,14 @@ public class RenderUtil {
 
     public static void dragon(PoseStack mStack, MultiBufferSource buf, double x, double y, double z, float radius, float r, float g, float b) {
         float f5 = 0.5f; // max number of beams
-        float f7 = Math.min(f5 > 0.8F ? (f5 - 0.8F) / 0.2F : 0.0F, 1.0F);
+        //float f7 = Math.min(f5 > 0.8F ? (f5 - 0.8F) / 0.2F : 0.0F, 1.0F);
+        float f7 = 0.0F;
         Random random = new Random(432L);
         VertexConsumer builder = buf.getBuffer(GLOWING);
         mStack.pushPose();
         mStack.translate(x, y, z);
 
-        float rotation = ClientEvents.getClientTicks() / 200;
+        float rotation = ClientInfo.getClientPartialTicks() / 200;
 
         for(int i = 0; (float)i < (f5 + f5 * f5) / 2.0F * 60.0F; ++i) {
             mStack.mulPose(Axis.XP.rotationDegrees(random.nextFloat() * 360.0F));

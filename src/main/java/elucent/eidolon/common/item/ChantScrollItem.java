@@ -5,8 +5,8 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import elucent.eidolon.api.spells.Sign;
 import elucent.eidolon.client.ClientRegistry;
 import elucent.eidolon.common.entity.ChantCasterEntity;
-import elucent.eidolon.event.ClientEvents;
 import elucent.eidolon.registries.Signs;
+import elucent.eidolon.util.ClientInfo;
 import elucent.eidolon.util.RenderUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -108,7 +108,7 @@ public class ChantScrollItem extends ItemBase {
                 RenderSystem.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE);
                 RenderSystem.setShader(ClientRegistry::getGlowingSpriteShader);
                 RenderSystem.setShaderTexture(0, InventoryMenu.BLOCK_ATLAS);
-                float flicker = 0.75f + 0.05f * (float) Math.sin(Math.toRadians(12 * ClientEvents.getClientTicks() - 360.0f * i / spell.size()));
+                float flicker = 0.75f + 0.05f * (float) Math.sin(Math.toRadians(12 * ClientInfo.getClientPartialTicks() - 360.0f * i / spell.size()));
                 for (int j = 0; j < 2; j++) {
                     RenderUtil.litQuad(mStack, bufferSource, 2 + pX + 17 * (i % 7), pY + 16 * (int) (i / 7F), 16, 16,
                             sign.getRed() * flicker, sign.getGreen() * flicker, sign.getBlue() * flicker, Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(sign.getSprite()));

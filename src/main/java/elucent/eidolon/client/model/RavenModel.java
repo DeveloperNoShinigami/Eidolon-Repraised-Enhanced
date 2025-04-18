@@ -6,7 +6,7 @@ package elucent.eidolon.client.model;// Made with Blockbench 3.7.4
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import elucent.eidolon.common.entity.RavenEntity;
-import elucent.eidolon.event.ClientEvents;
+import elucent.eidolon.util.ClientInfo;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
@@ -86,12 +86,12 @@ public class RavenModel extends EntityModel<RavenEntity> {
 			leftLeg.xRot = 0;
 
 			if (entity.getDeltaMovement().y < 0) {
-				rightWing.zRot = Mth.sin(ClientEvents.getClientTicks()) * 0.1f;
-				leftWing.zRot = -Mth.sin(0.97f + ClientEvents.getClientTicks()) * 0.1f;
+				rightWing.zRot = Mth.sin(ClientInfo.getClientPartialTicks()) * 0.1f;
+				leftWing.zRot = -Mth.sin(0.97f + ClientInfo.getClientPartialTicks()) * 0.1f;
 			}
 			else {
-				rightWing.zRot = (float)Math.sin(ClientEvents.getClientTicks()) * 0.4f;
-				leftWing.zRot = -(float)Math.sin(ClientEvents.getClientTicks()) * 0.4f;
+				rightWing.zRot = (float) Math.sin(ClientInfo.getClientPartialTicks()) * 0.4f;
+				leftWing.zRot = -(float) Math.sin(ClientInfo.getClientPartialTicks()) * 0.4f;
 			}
 		}
 

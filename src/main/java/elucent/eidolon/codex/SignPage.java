@@ -7,7 +7,7 @@ import com.mojang.math.Axis;
 import elucent.eidolon.Eidolon;
 import elucent.eidolon.api.spells.Sign;
 import elucent.eidolon.client.ClientRegistry;
-import elucent.eidolon.event.ClientEvents;
+import elucent.eidolon.util.ClientInfo;
 import elucent.eidolon.util.RenderUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -39,7 +39,7 @@ public class SignPage extends Page {
         mStack.pushPose();
         mStack.translate(x + 64, y + 80, 0);
         // mStack.scale(0.9f, 0.9f, 0.9f);
-        mStack.mulPose(Axis.ZP.rotationDegrees(ClientEvents.getClientTicks() * 1.5f));
+        mStack.mulPose(Axis.ZP.rotationDegrees(ClientInfo.getClientPartialTicks() * 1.5f));
         colorBlit(mStack, -40, -40, 128, 96, 80, 80, 256, 256, sign.getColor());
         mStack.popPose();
         RenderSystem.setShaderTexture(0, InventoryMenu.BLOCK_ATLAS);

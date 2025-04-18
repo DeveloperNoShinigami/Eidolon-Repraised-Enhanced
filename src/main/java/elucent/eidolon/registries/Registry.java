@@ -128,6 +128,11 @@ public class Registry {
         return addItem(name, () -> new Item(props));
     }
 
+    static RegistryObject<Item> addItem(String name, String lore) {
+        return addItem(name, () -> new ItemBase(itemProps()).setLore(lore));
+    }
+
+
     static RegistryObject<Item> addItem(String name, Supplier<Item> item) {
         return ITEMS.register(name, item);
     }
@@ -172,7 +177,7 @@ public class Registry {
     public static final RegistryObject<Item> ARCANE_GOLD_INGOT = addItem("arcane_gold_ingot");
     public static final RegistryObject<Item> ARCANE_GOLD_NUGGET = addItem("arcane_gold_nugget");
     public static final RegistryObject<Item> ELDER_BRICK = addItem("elder_brick");
-    public static final RegistryObject<Item> OFFERING_INCENSE = addItem("offering_incense");
+    public static final RegistryObject<Item> OFFERING_INCENSE = addItem("offering_incense", "lore.eidolon.offering_incense");
     public static final RegistryObject<Item> RESTORATION_INCENSE = addItem("restoration_incense");
     public static final RegistryObject<Item> GLOOM_INCENSE = addItem("gloom_incense");
     public static final RegistryObject<Item> DEATH_BANE_INCENSE = addItem("deathbane_incense");
@@ -203,7 +208,7 @@ public class Registry {
     public static final RegistryObject<Item> BASIC_BELT = addItem("basic_belt", () -> new BasicBeltItem(itemProps().stacksTo(1)));
     public static final RegistryObject<Item> CODEX = addItem("codex", () -> new CodexItem(itemProps().stacksTo(1).rarity(Rarity.UNCOMMON)).setLore("lore.eidolon.codex"));
     public static final RegistryObject<Item> CHANT_SCROLL = addItem("chant_scroll", () -> new ChantScrollItem(itemProps().stacksTo(64).rarity(Rarity.UNCOMMON)).setLore("lore.eidolon.chant_scroll"));
-    public static final RegistryObject<Item> SOUL_SHARD = addItem("soul_shard");
+    public static final RegistryObject<Item> SOUL_SHARD = addItem("soul_shard", "lore.eidolon.soul_shard");
     public static final RegistryObject<Item> DEATH_ESSENCE = addItem("death_essence");
     public static final RegistryObject<Item> CRIMSON_ESSENCE = addItem("crimson_essence");
     public static final RegistryObject<Item> CRIMSON_GEM = addItem("crimson_gem");
@@ -552,7 +557,6 @@ public class Registry {
     public static RegistryObject<BlockEntityType<GobletTileEntity>> GOBLET_TILE_ENTITY;
     public static RegistryObject<BlockEntityType<CenserTileEntity>> CENSER_TILE_ENTITY;
     public static RegistryObject<BlockEntityType<ResearchTableTileEntity>> RESEARCH_TABLE_TILE_ENTITY;
-
     public static RegistryObject<BlockEntityType<ScriptoriumTile>> SCRIPTORIUM_TILE;
 
 

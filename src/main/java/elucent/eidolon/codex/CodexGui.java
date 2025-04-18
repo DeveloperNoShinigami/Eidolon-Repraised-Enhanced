@@ -6,9 +6,9 @@ import elucent.eidolon.Eidolon;
 import elucent.eidolon.api.spells.Rune;
 import elucent.eidolon.api.spells.Sign;
 import elucent.eidolon.client.ClientRegistry;
-import elucent.eidolon.event.ClientEvents;
 import elucent.eidolon.network.AttemptCastPacket;
 import elucent.eidolon.network.Networking;
+import elucent.eidolon.util.ClientInfo;
 import elucent.eidolon.util.RenderUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -55,6 +55,20 @@ public class CodexGui extends Screen {
 
     public static void blit(GuiGraphics guiGraphics, int pX, int pY, float pUOffset, float pVOffset, int pWidth, int pHeight, int pTextureWidth, int pTextureHeight) {
         guiGraphics.blit(CODEX_BACKGROUND, pX, pY, pUOffset, pVOffset, pWidth, pHeight, pTextureWidth, pTextureHeight);
+    }
+
+    public static void openToEntry(Chapter docEntry, int i) {
+        if (docEntry == null) {
+            CodexGui.getInstance().onClose();
+            return;
+        }
+        if (Minecraft.getInstance().screen instanceof CodexGui codexGui && codexGui.currentChapter == docEntry) {
+            return;
+        }
+        CodexGui codexGui = getInstance();
+        codexGui.changeChapter(docEntry);
+        codexGui.currentPage = i;
+        Minecraft.getInstance().setScreen(codexGui);
     }
 
     protected void resetPages() {
@@ -114,7 +128,7 @@ public class CodexGui extends Screen {
         bgx = baseX + 16;
         RenderSystem.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE);
         for (int i = 0; i < chant.size(); i++) {
-            float flicker = 0.75f + 0.25f * (float) Math.sin(Math.toRadians(12 * ClientEvents.getClientTicks() - 360.0f * i / chant.size()));
+            float flicker = 0.75f + 0.25f * (float) Math.sin(Math.toRadians(12 * ClientInfo.getClientPartialTicks() - 360.0f * i / chant.size()));
             Sign sign = chant.get(i);
             RenderUtil.litQuad(mStack.pose(), buffersource, bgx + 4, baseY + 4, 16, 16,
                     sign.getRed() * flicker, sign.getGreen() * flicker, sign.getBlue() * flicker, Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(sign.getSprite()));
@@ -190,14 +204,6 @@ public class CodexGui extends Screen {
     }
 
     protected boolean interactChant(int x, int y, int mouseX, int mouseY) {
-        /*
-        int chantWidth = 32 + 12 * chant.size();
-        int baseX = x + xSize / 2 - chantWidth / 2, baseY = y + 180;
-        int bgx = baseX + chantWidth + 8;
-        boolean chantHover = mouseX >= bgx && mouseY >= baseY - 4 && mouseX <= bgx + 32 && mouseY <= baseY + 28;
-        bgx += 36;
-        boolean cancelHover = mouseX >= bgx && mouseY >= baseY - 4 && mouseX <= bgx + 32 && mouseY <= baseY + 28;
-        */
         int chantWidth = 32 + 24 * chant.size();
         int baseX = x + xSize / 2 - chantWidth / 2, baseY = y + 180;
         int bgx = baseX + chantWidth + 8;

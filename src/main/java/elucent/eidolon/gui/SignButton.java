@@ -6,7 +6,7 @@ import com.mojang.math.Axis;
 import elucent.eidolon.api.spells.Sign;
 import elucent.eidolon.client.ClientRegistry;
 import elucent.eidolon.codex.SignIndexPage;
-import elucent.eidolon.event.ClientEvents;
+import elucent.eidolon.util.ClientInfo;
 import elucent.eidolon.util.RenderUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -44,11 +44,11 @@ public class SignButton extends Button {
         RenderSystem.setShaderTexture(0, SignIndexPage.BACKGROUND);
         mStack.pushPose();
         mStack.translate(getX() + 24, getY() + 24, 0);
-        mStack.mulPose(Axis.ZP.rotationDegrees(ClientEvents.getClientTicks() * 1.5f));
+        mStack.mulPose(Axis.ZP.rotationDegrees(ClientInfo.getClientPartialTicks() * 1.5f));
         colorBlit(mStack, -18, -18, 128, 48, 36, 36, 256, 256, sign.getColor());
         mStack.popPose();
         RenderSystem.setShaderTexture(0, InventoryMenu.BLOCK_ATLAS);
-        float flicker = 0.75f + 0.05f * (float) Math.sin(Math.toRadians(12 * ClientEvents.getClientTicks()));
+        float flicker = 0.75f + 0.05f * (float) Math.sin(Math.toRadians(12 * ClientInfo.getClientPartialTicks()));
         for (int j = 0; j < (!infoHover ? 1 : 2); j++) {
             RenderUtil.litQuad(mStack, bufferSource, getX() + 12, getY() + 12, 24, 24,
                     sign.getRed() * flicker, sign.getGreen() * flicker, sign.getBlue() * flicker, Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(sign.getSprite()));

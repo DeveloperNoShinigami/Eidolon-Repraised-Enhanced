@@ -6,6 +6,7 @@ import elucent.eidolon.api.research.Research;
 import elucent.eidolon.api.spells.Sign;
 import elucent.eidolon.capability.IReputation;
 import elucent.eidolon.util.KnowledgeUtil;
+import elucent.eidolon.util.RegistryUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.resources.language.I18n;
@@ -35,6 +36,9 @@ public class IndexPage extends Page {
         public IndexEntry(Chapter chapter, ItemStack icon) {
             this.chapter = chapter;
             this.icon = icon;
+            // Only add to the map if the icon is from this mod
+            if (RegistryUtil.getRegistryName(icon.getItem()).getNamespace().equals(Eidolon.MODID))
+                CodexChapters.itemToEntryMap.put(icon.getItem(), chapter);
         }
 
         public IndexEntry(Chapter chapter, ItemStack icon, boolean alwaysRender) {

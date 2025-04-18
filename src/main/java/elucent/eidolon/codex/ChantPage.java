@@ -7,8 +7,8 @@ import elucent.eidolon.Eidolon;
 import elucent.eidolon.api.spells.Sign;
 import elucent.eidolon.api.spells.Spell;
 import elucent.eidolon.client.ClientRegistry;
-import elucent.eidolon.event.ClientEvents;
 import elucent.eidolon.recipe.ChantRecipe;
+import elucent.eidolon.util.ClientInfo;
 import elucent.eidolon.util.RenderUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -71,7 +71,7 @@ public class ChantPage extends Page {
                 CodexGui.blit(guiGraphics, baseX + i * 24, y + 28, 312, 208, 24, 24, 512, 512);
 
                 Sign sign = chant[i];
-                float flicker = 0.875f + 0.125f * (float) Math.sin(Math.toRadians(12 * ClientEvents.getClientTicks()));
+                float flicker = 0.875f + 0.125f * (float) Math.sin(Math.toRadians(12 * ClientInfo.getClientPartialTicks()));
                 RenderSystem.setShader(ClientRegistry::getGlowingSpriteShader);
                 RenderSystem.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE);
                 RenderUtil.litQuad(mStack, bufferSource, baseX + i * 24 + 4, y + 32, 16, 16,
