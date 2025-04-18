@@ -3,10 +3,10 @@ package elucent.eidolon.registries;
 import elucent.eidolon.Eidolon;
 import elucent.eidolon.capability.*;
 import elucent.eidolon.client.particle.*;
-import elucent.eidolon.common.block.CandleBlock;
 import elucent.eidolon.common.block.*;
-import elucent.eidolon.common.item.Tiers;
+import elucent.eidolon.common.block.CandleBlock;
 import elucent.eidolon.common.item.*;
+import elucent.eidolon.common.item.Tiers;
 import elucent.eidolon.common.item.curio.*;
 import elucent.eidolon.common.tile.*;
 import elucent.eidolon.common.world.EidolonAbstractTreeFeature;
@@ -145,6 +145,12 @@ public class Registry {
         return block;
     }
 
+    static <T extends Block> RegistryObject<T> addBlock(String name, Supplier<T> b, String lore) {
+        var block = BLOCKS.register(name, b);
+        ITEMS.register(name, () -> new LoreBlockItem(block.get(), itemProps(), lore));
+        return block;
+    }
+
     public static final WoodType ILLWOOD = register(new WoodType("eidolon:illwood", BlockSetType.DARK_OAK));
     public static final WoodType POLISHED = register(new WoodType("eidolon:polished", BlockSetType.DARK_OAK));
 
@@ -167,6 +173,19 @@ public class Registry {
     public static final RegistryObject<Item> ARCANE_GOLD_NUGGET = addItem("arcane_gold_nugget");
     public static final RegistryObject<Item> ELDER_BRICK = addItem("elder_brick");
     public static final RegistryObject<Item> OFFERING_INCENSE = addItem("offering_incense");
+    public static final RegistryObject<Item> RESTORATION_INCENSE = addItem("restoration_incense");
+    public static final RegistryObject<Item> GLOOM_INCENSE = addItem("gloom_incense");
+    public static final RegistryObject<Item> DEATH_BANE_INCENSE = addItem("deathbane_incense");
+    public static final RegistryObject<Item> TOUGH_INCENSE = addItem("tough_incense");
+    public static final RegistryObject<Item> FRAIL_INCENSE = addItem("frail_incense");
+    public static final RegistryObject<Item> FROSTBIND_INCENSE = addItem("frostbind_incense");
+    public static final RegistryObject<Item> TETHER_INCENSE = addItem("tether_incense");
+    public static final RegistryObject<Item> PURITY_INCENSE = addItem("purity_incense");
+    public static final RegistryObject<Item> QUICKEN_INCENSE = addItem("quicken_incense");
+    public static final RegistryObject<Item> BLOODLUST_INCENSE = addItem("bloodlust_incense");
+    public static final RegistryObject<Item> SOUL_HARVEST_INCENSE = addItem("soul_harvest_incense");
+    public static final RegistryObject<Item> WARDING_INCENSE = addItem("warding_incense");
+    public static final RegistryObject<Item> UNDEATH_INCENSE = addItem("undeath_incense");
     public static final RegistryObject<Item> SULFUR = addItem("sulfur");
     public static final RegistryObject<Item> GOLD_INLAY = addItem("gold_inlay");
     public static final RegistryObject<Item> ZOMBIE_HEART = addItem("zombie_heart", () -> new ItemBase(itemProps().rarity(Rarity.UNCOMMON).food(
@@ -183,6 +202,7 @@ public class Registry {
     public static final RegistryObject<Item> BASIC_AMULET = addItem("basic_amulet", () -> new BasicAmuletItem(itemProps().stacksTo(1)));
     public static final RegistryObject<Item> BASIC_BELT = addItem("basic_belt", () -> new BasicBeltItem(itemProps().stacksTo(1)));
     public static final RegistryObject<Item> CODEX = addItem("codex", () -> new CodexItem(itemProps().stacksTo(1).rarity(Rarity.UNCOMMON)).setLore("lore.eidolon.codex"));
+    public static final RegistryObject<Item> CHANT_SCROLL = addItem("chant_scroll", () -> new ChantScrollItem(itemProps().stacksTo(64).rarity(Rarity.UNCOMMON)).setLore("lore.eidolon.chant_scroll"));
     public static final RegistryObject<Item> SOUL_SHARD = addItem("soul_shard");
     public static final RegistryObject<Item> DEATH_ESSENCE = addItem("death_essence");
     public static final RegistryObject<Item> CRIMSON_ESSENCE = addItem("crimson_essence");
@@ -263,7 +283,7 @@ public class Registry {
                     .effect(() -> new MobEffectInstance(MobEffects.HUNGER, 1800), 0.875f)
                     .effect(() -> new MobEffectInstance(MobEffects.WITHER, 900, 1), 1.0f)
                     .build())).setLore("lore.eidolon.withered_heart"));
-    public static final RegistryObject<Item> IMBUED_BONES = addItem("imbued_bones", itemProps().rarity(Rarity.UNCOMMON));
+    public static final RegistryObject<Item> IMBUED_BONES = addItem("imbued_bones", () -> new ItemBase(itemProps().rarity(Rarity.UNCOMMON)).setLore("lore.eidolon.imbued_bones"));
     public static final RegistryObject<Item> SUMMONING_STAFF = addItem("summoning_staff", () -> new SummoningStaffItem(itemProps().rarity(Rarity.RARE).stacksTo(1)));
     public static final RegistryObject<Item> DEATHBRINGER_SCYTHE = addItem("deathbringer_scythe", () -> new DeathbringerScytheItem(itemProps().rarity(Rarity.RARE).stacksTo(1))
             .setLore("lore.eidolon.deathbringer_scythe"));
@@ -275,7 +295,7 @@ public class Registry {
     public static final RegistryObject<Item> PAROUSIA_DISC = addItem("music_disc_parousia", () -> new RecordItem(9, EidolonSounds.PAROUSIA,
             itemProps().stacksTo(1).rarity(Rarity.RARE), 3680));
     public static final RegistryObject<Item> RAVEN_FEATHER = addItem("raven_feather");
-    public static final RegistryObject<Item> RAVEN_CLOAK = addItem("raven_cloak", () -> new RavenCloakItem(itemProps().rarity(Rarity.RARE).stacksTo(1)));
+    public static final RegistryObject<Item> RAVEN_CLOAK = addItem("raven_cloak", () -> new RavenCloakItem(itemProps().rarity(Rarity.RARE).stacksTo(1)).setLore("lore.eidolon.raven_cloak"));
     public static final RegistryObject<Item> MERAMMER_RESIN = addItem("merammer_resin");
     public static final RegistryObject<Item> MAGIC_INK = addItem("magic_ink");
     public static final RegistryObject<Item> MAGICIANS_WAX = addItem("magicians_wax");
@@ -370,6 +390,9 @@ public class Registry {
             Shapes.box(0.125, 0.25, 0.125, 0.875, 0.625, 0.875),
             Shapes.box(0, 0.625, 0, 1, 1, 1)
     )));
+
+    public static final RegistryObject<Block> SCRIPTORIUM = addBlock("scriptorium", () -> new Scriptorium(blockProps(Blocks.CRAFTING_TABLE)));
+
     public static final RegistryObject<Block> PLINTH = addBlock("plinth", () -> new PillarBlockBase(blockProps(Blocks.STONE)
             .sound(SoundType.STONE).strength(2.0f, 3.0f)
             .requiresCorrectToolForDrops().noOcclusion())
@@ -414,13 +437,15 @@ public class Registry {
                     Shapes.box(0, 0.25, 0, 1, 1, 1),
                     Shapes.box(0.25, 0, 0.25, 0.75, 0.25, 0.75))));
     public static final RegistryObject<Block> MERAMMER_ROOT = addBlock("merammer_root", () -> new HerbBlockBase(blockProps(Blocks.WHEAT)
-            .sound(SoundType.GRASS).noOcclusion()));
+            .sound(SoundType.GRASS).noOcclusion()), "lore.eidolon.merammer_root");
     public static final RegistryObject<Block> AVENNIAN_SPRIG = addBlock("avennian_sprig", () -> new HerbBlockBase(blockProps(Blocks.WHEAT)
-            .sound(SoundType.GRASS).noOcclusion()));
+            .sound(SoundType.GRASS).noOcclusion()), "lore.eidolon.avennian_sprig");
     public static final RegistryObject<Block> OANNA_BLOOM = addBlock("oanna_bloom", () -> new HerbBlockBase(blockProps(Blocks.WHEAT)
-            .sound(SoundType.GRASS).noOcclusion()));
+            .sound(SoundType.GRASS).noOcclusion()), "lore.eidolon.oanna_bloom");
     public static final RegistryObject<Block> SILDRIAN_SEED = addBlock("sildrian_seed", () -> new HerbBlockBase(blockProps(Blocks.WHEAT)
-            .sound(SoundType.GRASS).noOcclusion()));
+            .sound(SoundType.GRASS).noOcclusion()), "lore.eidolon.sildrian_seed");
+    public static final RegistryObject<Block> MIRECAP = addBlock("mirecap", () -> new HerbBlockBase(blockProps(Blocks.BROWN_MUSHROOM)
+            .sound(SoundType.NETHER_WART).noOcclusion()), "lore.eidolon.mirecap");
     public static final RegistryObject<Block> ILLWOOD_SAPLING = addBlock("illwood_sapling", () -> new SaplingBlock(new EidolonAbstractTreeFeature.TreeGrower(), blockProps(Blocks.OAK_SAPLING)
             .sound(SoundType.GRASS).noOcclusion().noCollission()));
     public static final RegistryObject<Block> ILLWOOD_LEAVES = addBlock("illwood_leaves", () -> new LeavesBlock(blockProps(Blocks.MANGROVE_LEAVES)
@@ -482,9 +507,6 @@ public class Registry {
                     .sound(SoundType.STONE).strength(3.0f, 3.0f)
                     .requiresCorrectToolForDrops()));
 
-    public static final RegistryObject<Block> SCRIPTORIUM = addBlock("scriptorium", () -> new Scriptorium(blockProps(Blocks.CRAFTING_TABLE)));
-
-
     public static final RegistryObject<MenuType<WorktableContainer>>
             WORKTABLE_CONTAINER = addContainer("worktable", WorktableContainer::new);
     public static final RegistryObject<MenuType<SoulEnchanterContainer>>
@@ -532,7 +554,6 @@ public class Registry {
     public static RegistryObject<BlockEntityType<ResearchTableTileEntity>> RESEARCH_TABLE_TILE_ENTITY;
 
     public static RegistryObject<BlockEntityType<ScriptoriumTile>> SCRIPTORIUM_TILE;
-
 
 
     static {

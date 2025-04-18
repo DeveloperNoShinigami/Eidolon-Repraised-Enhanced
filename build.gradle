@@ -144,28 +144,28 @@ dependencies {
 
     ///*implementation*/ runtimeOnly fg.deobf("joefoxe:hexerei:0.3.2.2")
 
-    runtimeOnly fg.deobf("software.bernie.geckolib:geckolib-forge-${mc_version}:${gecko_version}")
+    //runtimeOnly fg.deobf("software.bernie.geckolib:geckolib-forge-${mc_version}:${gecko_version}")
 
-    implementation fg.deobf("com.hollingsworth.ars_nouveau:ars_nouveau-${mc_version}:${ars_version}")
-    runtimeOnly fg.deobf("vazkii.patchouli:Patchouli:${mc_version}-81-FORGE")
+    compileOnly fg.deobf("com.hollingsworth.ars_nouveau:ars_nouveau-${mc_version}:${ars_version}")
+    //runtimeOnly fg.deobf("vazkii.patchouli:Patchouli:${mc_version}-81-FORGE")
     //runtimeOnly fg.deobf("curse.maven:cyanide-541676:3832812") // Cyanide
 
     runtimeOnly fg.deobf("curse.maven:embeddium-908741:4800420")
     runtimeOnly fg.deobf("curse.maven:modernfix-790626:4792389")
 
-    implementation fg.deobf("curse.maven:placebo-283644:5414631")
-    implementation fg.deobf("curse.maven:apothic-attributes-898963:5340012")
-    implementation fg.deobf("curse.maven:apotheosis-313970:5486368")
+    compileOnly fg.deobf("curse.maven:placebo-283644:5414631")
+    compileOnly fg.deobf("curse.maven:apothic-attributes-898963:5340012")
+    compileOnly fg.deobf("curse.maven:apotheosis-313970:5486368")
 
-    runtimeOnly fg.deobf("curse.maven:amendments-896746:5200593")
-    runtimeOnly fg.deobf("curse.maven:selene-499980:5201144")
-    runtimeOnly fg.deobf("curse.maven:spit-it-out-857141:4888754")
+    //runtimeOnly fg.deobf("curse.maven:amendments-896746:5200593")
+    //runtimeOnly fg.deobf("curse.maven:selene-499980:5201144")
+    //runtimeOnly fg.deobf("curse.maven:spit-it-out-857141:4888754")
 
     implementation(annotationProcessor("com.github.llamalad7.mixinextras:mixinextras-common:0.2.0-beta.8"))
     implementation("com.github.llamalad7.mixinextras:mixinextras-forge:0.2.0-beta.8")
 
-    runtimeOnly fg.deobf("team.lodestar.lodestone:lodestone:1.20.1-1.6.4.252")
-    runtimeOnly fg.deobf("com.sammy.malum:malum:1.20.1-1.6.5.242") { transitive = false }
+    //runtimeOnly fg.deobf("team.lodestar.lodestone:lodestone:1.20.1-1.6.4.252")
+    //runtimeOnly fg.deobf("com.sammy.malum:malum:1.20.1-1.6.5.242") { transitive = false }
 
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 }

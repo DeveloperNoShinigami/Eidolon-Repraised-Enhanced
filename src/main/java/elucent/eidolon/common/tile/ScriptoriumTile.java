@@ -8,17 +8,12 @@ import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.inventory.ContainerLevelAccess;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class ScriptoriumTile extends TileEntityBase implements MenuProvider {
-
-    public ScriptoriumTile(BlockEntityType<?> tileEntityTypeIn, BlockPos pos, BlockState state) {
-        super(tileEntityTypeIn, pos, state);
-    }
-
 
     public ScriptoriumTile(BlockPos pos, BlockState state) {
         super(Registry.SCRIPTORIUM_TILE.get(), pos, state);
@@ -32,7 +27,7 @@ public class ScriptoriumTile extends TileEntityBase implements MenuProvider {
 
     @Override
     public @Nullable AbstractContainerMenu createMenu(int pContainerId, @NotNull Inventory pPlayerInventory, @NotNull Player pPlayer) {
-        return new ScriptoriumContainer(pContainerId, pPlayerInventory);
+        return new ScriptoriumContainer(pContainerId, pPlayerInventory, ContainerLevelAccess.create(pPlayer.level(), worldPosition));
     }
 
 }

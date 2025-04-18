@@ -27,7 +27,7 @@ public class SignButton extends Button {
         super(pX, pY, pWidth, pHeight, pMessage, pOnPress, pCreateNarration);
     }
 
-    public SignButton(int x, int y, int w, int h, Sign sign , OnPress onPress) {
+    public SignButton(int x, int y, int w, int h, Sign sign, OnPress onPress) {
         this(x, y, w, h, Component.empty(), onPress, Button.DEFAULT_NARRATION);
         this.sign = sign;
     }
@@ -48,10 +48,10 @@ public class SignButton extends Button {
         colorBlit(mStack, -18, -18, 128, 48, 36, 36, 256, 256, sign.getColor());
         mStack.popPose();
         RenderSystem.setShaderTexture(0, InventoryMenu.BLOCK_ATLAS);
+        float flicker = 0.75f + 0.05f * (float) Math.sin(Math.toRadians(12 * ClientEvents.getClientTicks()));
         for (int j = 0; j < (!infoHover ? 1 : 2); j++) {
-
             RenderUtil.litQuad(mStack, bufferSource, getX() + 12, getY() + 12, 24, 24,
-                    sign.getRed(), sign.getGreen(), sign.getBlue(), Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(sign.getSprite()));
+                    sign.getRed() * flicker, sign.getGreen() * flicker, sign.getBlue() * flicker, Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(sign.getSprite()));
             bufferSource.endBatch();
         }
         RenderSystem.disableBlend();

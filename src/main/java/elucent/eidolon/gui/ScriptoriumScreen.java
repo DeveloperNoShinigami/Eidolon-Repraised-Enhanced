@@ -9,6 +9,8 @@ import elucent.eidolon.Eidolon;
 import elucent.eidolon.api.spells.Sign;
 import elucent.eidolon.client.ClientRegistry;
 import elucent.eidolon.event.ClientEvents;
+import elucent.eidolon.network.InscribePacket;
+import elucent.eidolon.network.Networking;
 import elucent.eidolon.util.KnowledgeUtil;
 import elucent.eidolon.util.RenderUtil;
 import net.minecraft.client.Minecraft;
@@ -55,12 +57,12 @@ public class ScriptoriumScreen extends AbstractContainerScreen<ScriptoriumContai
         bookBottom = height / 2 + FULL_HEIGHT / 2;
         currentChant = new ArrayList<>();
         layoutSigns();
-        addRenderableWidget(new ChantButton(bookLeft, bookTop + 60, 32, 32, (b) -> {
+        addRenderableWidget(new ChantButton(bookRight - 22, bookTop + 6, 32, 32, (b) -> {
             if (!currentChant.isEmpty()) {
-                this.menu.setChant(currentChant);
+                Networking.sendToServer(new InscribePacket(this.menu.containerId, currentChant));
             }
         }));
-        addRenderableWidget(new CancelButton(bookLeft, bookTop + 60 + 36, 32, 32, (b) -> currentChant.clear()));
+        addRenderableWidget(new CancelButton(bookRight - 22, bookTop + 6 + 32, 32, 32, (b) -> currentChant.clear()));
     }
 
     @Override
@@ -79,6 +81,7 @@ public class ScriptoriumScreen extends AbstractContainerScreen<ScriptoriumContai
 
     public void drawBackgroundElements(GuiGraphics graphics) {
         graphics.blit(background, 32, 0, 0, 0, 200, FULL_HEIGHT, FULL_WIDTH, FULL_HEIGHT);
+        graphics.blit(background, 232, 67, 200, 92, 36, 56, FULL_WIDTH, FULL_HEIGHT);
     }
 
     public void drawForegroundElements(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
@@ -156,7 +159,7 @@ public class ScriptoriumScreen extends AbstractContainerScreen<ScriptoriumContai
         bgx = baseX + 16;
         RenderSystem.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE);
         for (int i = 0; i < chant.size(); i++) {
-            float flicker = 0.75f + 0.25f * (float) Math.sin(Math.toRadians(12 * ClientEvents.getClientTicks() - 360.0f * i / chant.size()));
+            float flicker = 0.75f + 0.05f * (float) Math.sin(Math.toRadians(12 * ClientEvents.getClientTicks() - 360.0f * i / chant.size()));
             Sign sign = chant.get(i);
             RenderUtil.litQuad(mStack.pose(), buffersource, bgx + 4, y + 4, 16, 16,
                     sign.getRed() * flicker, sign.getGreen() * flicker, sign.getBlue() * flicker, Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(sign.getSprite()));

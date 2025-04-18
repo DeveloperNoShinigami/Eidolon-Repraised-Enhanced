@@ -8,6 +8,7 @@ import elucent.eidolon.capability.IPlayerData;
 import elucent.eidolon.capability.ISoul;
 import elucent.eidolon.client.model.*;
 import elucent.eidolon.client.renderer.*;
+import elucent.eidolon.common.item.ChantScrollItem;
 import elucent.eidolon.common.item.IManaRelatedItem;
 import elucent.eidolon.common.item.IWingsItem;
 import elucent.eidolon.common.item.curio.RavenCloakRenderer;
@@ -45,7 +46,6 @@ import net.minecraftforge.fml.common.Mod;
 import top.theillusivec4.curios.api.client.CuriosRendererRegistry;
 
 import java.io.IOException;
-import java.util.NoSuchElementException;
 import java.util.Random;
 
 @Mod.EventBusSubscriber(modid = Eidolon.MODID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.MOD)
@@ -55,6 +55,7 @@ public class ClientRegistry {
     @SubscribeEvent
     public static void registerTooltip(RegisterClientTooltipComponentFactoriesEvent event) {
         event.register(SanguineAmuletItem.SanguineAmuletTooltipInfo.class, SanguineAmuletItem.SanguineAmuletTooltipComponent::new);
+        event.register(ChantScrollItem.ChantTooltipInfo.class, ChantScrollItem.ChantTooltipComponent::new);
     }
 
     public static final ModelLayerLocation SILVER_ARMOR_LAYER = new ModelLayerLocation(new ResourceLocation(Eidolon.MODID, "silver_armor"), "main");
@@ -240,10 +241,10 @@ public class ClientRegistry {
             final int barlength = 114;
             float magic = 0, maxMagic = 0;
             try {
-                ISoul soul = player.getCapability(ISoul.INSTANCE).resolve().get();
+                ISoul soul = player.getCapability(ISoul.INSTANCE).resolve().orElseThrow();
                 magic = soul.getMagic();
                 maxMagic = soul.getMaxMagic();
-            } catch (NoSuchElementException e) {
+            } catch (Exception e) {
                 //
             }
             if (maxMagic == 0) return;
@@ -371,10 +372,10 @@ public class ClientRegistry {
 
             float etherealHealth = 0, etherealMax = 0;
             try {
-                ISoul cap = player.getCapability(ISoul.INSTANCE).resolve().get();
+                ISoul cap = player.getCapability(ISoul.INSTANCE).resolve().orElseThrow();
                 etherealHealth = cap.getEtherealHealth();
                 etherealMax = cap.getMaxEtherealHealth();
-            } catch (NoSuchElementException e) {
+            } catch (Exception e) {
                 // ignore empty optional
             }
 

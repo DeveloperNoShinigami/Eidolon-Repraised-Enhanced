@@ -1,6 +1,7 @@
 {
-  "parent": "minecraft:block/crop",
+  "render_type": "cutout_mipped",
+  "parent": "minecraft:block/cross",
   "textures": {
-    "crop": "eidolon:block/mirecap_0"
+    "cross": "eidolon:block/mirecap_0"
   }
 }

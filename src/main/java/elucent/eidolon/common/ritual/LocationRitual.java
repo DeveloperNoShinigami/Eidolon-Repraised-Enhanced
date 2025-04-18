@@ -31,6 +31,11 @@ public class LocationRitual extends Ritual {
     }
 
     @Override
+    public Component getName() {
+        return Component.translatable(Eidolon.MODID + ".location", structureTagKey.location().getPath());
+    }
+
+    @Override
     public Ritual cloneRitual() {
         return new LocationRitual(structureTagKey);
     }

@@ -27,7 +27,7 @@ public class CraftingRitual extends Ritual {
 
     @Override
     public Component getName() {
-        return Component.translatable("eidolon.ritual.crafting", result.getDisplayName());
+        return Component.translatable("eidolon.ritual.crafting", result.getDisplayName().getString());
     }
 
     @Override

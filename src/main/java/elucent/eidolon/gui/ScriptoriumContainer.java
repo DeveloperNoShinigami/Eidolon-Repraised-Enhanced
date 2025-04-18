@@ -1,28 +1,43 @@
 package elucent.eidolon.gui;
 
 import elucent.eidolon.api.spells.Sign;
+import elucent.eidolon.common.item.ChantScrollItem;
 import elucent.eidolon.registries.Registry;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.*;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.ContainerLevelAccess;
+import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-public class ScriptoriumContainer extends AbstractContainerMenu implements ContainerListener {
+public class ScriptoriumContainer extends AbstractContainerMenu {
 
-    public ScriptoriumContainer(int pContainerId, Inventory pPlayerInventory) {
-        this(pContainerId, pPlayerInventory, new SimpleContainer(2), new SimpleContainerData(2));
+    private final Container inventory = new SimpleContainer(2) {
+        @Override
+        public void setChanged() {
+            super.setChanged();
+            ScriptoriumContainer.this.slotsChanged(this);
+        }
+    };
+
+    private final ContainerLevelAccess access;
+
+    public List<Sign> signs;
+
+    public ScriptoriumContainer(int id, Inventory playerInventory) {
+        this(id, playerInventory, ContainerLevelAccess.NULL);
     }
 
-    public ScriptoriumContainer(int id, Inventory playerInventory, Container inventory, ContainerData data) {
+    public ScriptoriumContainer(int id, Inventory playerInventory, ContainerLevelAccess access) {
         super(Registry.SCRIPTORIUM_CONTAINER.get(), id);
-
-        this.addSlot(new NotesSlot(inventory, 0, 200, 51));
-        this.addSlot(new NotesSlot(inventory, 1, 200, 67));
+        this.access = access;
+        this.addSlot(new NotesSlot(inventory, 0, 200, 28));
+        this.addSlot(new NotesSlot(inventory, 1, 200, 51));
 
         for (int k = 0; k < 3; ++k) {
             for (int i1 = 0; i1 < 9; ++i1) {
@@ -33,6 +48,7 @@ public class ScriptoriumContainer extends AbstractContainerMenu implements Conta
         for (int l = 0; l < 9; ++l) {
             this.addSlot(new Slot(playerInventory, l, 12 + l * 18, 188));
         }
+
     }
 
     public @NotNull ItemStack quickMoveStack(@NotNull Player playerIn, int index) {
@@ -52,18 +68,18 @@ public class ScriptoriumContainer extends AbstractContainerMenu implements Conta
                 } else
                     // main inventory
                     if (index >= 2 && index < 29) {
-                    if (!this.moveItemStackTo(itemstack1, 29, 38, false)) {
-                        return ItemStack.EMPTY;
-                    }
-                } else
-                    // hotbar
-                    if (index >= 29) {
-                    if (!this.moveItemStackTo(itemstack1, 2, 29, false)) {
-                        return ItemStack.EMPTY;
-                    }
-                } else if (!this.moveItemStackTo(itemstack1, 2, 38, false)) {
-                    return ItemStack.EMPTY;
-                }
+                        if (!this.moveItemStackTo(itemstack1, 29, 38, false)) {
+                            return ItemStack.EMPTY;
+                        }
+                    } else
+                        // hotbar
+                        if (index >= 29) {
+                            if (!this.moveItemStackTo(itemstack1, 2, 29, false)) {
+                                return ItemStack.EMPTY;
+                            }
+                        } else if (!this.moveItemStackTo(itemstack1, 2, 38, false)) {
+                            return ItemStack.EMPTY;
+                        }
             } else { // we are in the table slots
                 if (!this.moveItemStackTo(itemstack1, 2, 38, false)) {
                     return ItemStack.EMPTY;
@@ -90,17 +106,7 @@ public class ScriptoriumContainer extends AbstractContainerMenu implements Conta
 
     @Override
     public boolean stillValid(@NotNull Player pPlayer) {
-        return true;
-    }
-
-    @Override
-    public void slotChanged(@NotNull AbstractContainerMenu pContainerToSend, int pDataSlotIndex, @NotNull ItemStack pStack) {
-
-    }
-
-    @Override
-    public void dataChanged(@NotNull AbstractContainerMenu pContainerMenu, int pDataSlotIndex, int pValue) {
-
+        return stillValid(this.access, pPlayer, Registry.SCRIPTORIUM.get());
     }
 
     @Override
@@ -119,15 +125,28 @@ public class ScriptoriumContainer extends AbstractContainerMenu implements Conta
     }
 
     public void setChant(List<Sign> currentChant) {
-
-        // takes the itemstack from the first slot and sets it to the chant, then move the itemstack to the second slot
-        ItemStack stack = this.slots.get(0).getItem();
-        if (!stack.isEmpty()) {
-            this.slots.get(0).set(ItemStack.EMPTY);
-            // Attach the chant to the itemstack
-            // stack.getOrCreateTag().put("chant", currentChant);
-            this.slots.get(1).set(stack);
+        // takes the itemstack from the first slot and sets it to the chant,
+        // then move the itemstack to the second slot
+        if (currentChant.isEmpty()) {
+            return;
         }
+        this.access.execute((p_217003_6_, p_217003_7_) -> {
+            ItemStack stack2 = this.slots.get(1).getItem().copy();
+            // check if the itemstack is empty or if it is the same as the current chant
+            if (stack2.isEmpty() || (stack2.getCount() < stack2.getMaxStackSize() && ChantScrollItem.getSpell(stack2).equals(currentChant))) {
+                ItemStack stack = this.slots.get(0).remove(1);
+                if (stack2.isEmpty()) {
+                    ChantScrollItem.setSpell(stack, currentChant);
+                    stack2 = stack;
+                } else {
+                    stack2.grow(1);
+                }
+                this.slots.get(1).set(stack2);
+
+                inventory.setChanged();
+                slotsChanged(inventory);
+            }
+        });
     }
 
     static class NotesSlot extends Slot {
@@ -137,7 +156,7 @@ public class ScriptoriumContainer extends AbstractContainerMenu implements Conta
 
         @Override
         public boolean mayPlace(ItemStack stack) {
-            return stack.is(Registry.RESEARCH_NOTES.get());
+            return stack.is(Registry.CHANT_SCROLL.get());
         }
 
     }

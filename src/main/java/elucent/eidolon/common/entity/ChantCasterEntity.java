@@ -8,6 +8,7 @@ import elucent.eidolon.client.particle.RuneParticleData;
 import elucent.eidolon.network.Networking;
 import elucent.eidolon.network.SpellCastPacket;
 import elucent.eidolon.registries.*;
+import elucent.eidolon.util.KnowledgeUtil;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
@@ -24,6 +25,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
@@ -60,6 +62,14 @@ public class ChantCasterEntity extends Entity implements IEntityAdditionalSpawnD
 
     public ChantCasterEntity(EntityType<?> entityTypeIn, Level worldIn) {
         super(entityTypeIn, worldIn);
+    }
+
+    public static void createChanter(Player player, Level world, List<Sign> runes) {
+        for (Sign rune : runes) if (!KnowledgeUtil.knowsSign(player, rune)) return;
+        Vec3 placement = player.position().add(0, player.getBbHeight() * 2 / 3, 0).add(player.getLookAngle().scale(0.5f));
+        ChantCasterEntity entity = new ChantCasterEntity(world, player, runes, player.getLookAngle());
+        entity.setPos(placement.x, placement.y, placement.z);
+        world.addFreshEntity(entity);
     }
 
     protected CompoundTag getNoRunesTag() {
@@ -148,7 +158,13 @@ public class ChantCasterEntity extends Entity implements IEntityAdditionalSpawnD
 
         //updates cached caster
         cacheCaster();
-        var castSpeed = caster != null ? caster.getAttribute(EidolonAttributes.CHANTING_SPEED.get()).getValue() : 1.0;
+        double castSpeed;
+        if (caster == null) {
+            castSpeed = 1.0;
+        } else {
+            AttributeInstance attribute = caster.getAttribute(EidolonAttributes.CHANTING_SPEED.get());
+            castSpeed = attribute != null ? attribute.getValue() : 1.0;
+        }
 
         if (timer <= 0 && tickCount % Mth.floor(5 / castSpeed) == 0) {
             List<Sign> runes = loadChantTag();
@@ -217,7 +233,8 @@ public class ChantCasterEntity extends Entity implements IEntityAdditionalSpawnD
         compound.put("signs_tag", getEntityData().get(SIGNS));
         compound.putInt("index", getEntityData().get(INDEX));
         compound.putInt("timer", timer);
-        compound.putUUID("caster_id", getEntityData().get(CASTER_ID).get());
+        if (getEntityData().get(CASTER_ID).isPresent())
+            compound.putUUID("caster_id", getEntityData().get(CASTER_ID).get());
         compound.putDouble("lookX", look.x);
         compound.putDouble("lookY", look.y);
         compound.putDouble("lookZ", look.z);

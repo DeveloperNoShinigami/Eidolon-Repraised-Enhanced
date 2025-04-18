@@ -210,6 +210,14 @@ public class Networking {
                 OpenCodexPacket::decode,
                 OpenCodexPacket::consume
         );
+
+        INSTANCE.registerMessage(
+                ++id,
+                InscribePacket.class,
+                InscribePacket::encode,
+                InscribePacket::decode,
+                InscribePacket::consume
+        );
     }
 
     public static <MSG> void sendToDimension(Level world, MSG msg, ResourceKey<Level> dimension) {
