@@ -10,7 +10,6 @@ import elucent.eidolon.api.spells.Sign;
 import elucent.eidolon.client.ClientRegistry;
 import elucent.eidolon.network.InscribePacket;
 import elucent.eidolon.network.Networking;
-import elucent.eidolon.util.ClientInfo;
 import elucent.eidolon.util.KnowledgeUtil;
 import elucent.eidolon.util.RenderUtil;
 import net.minecraft.client.Minecraft;
@@ -159,7 +158,7 @@ public class ScriptoriumScreen extends AbstractContainerScreen<ScriptoriumContai
         bgx = baseX + 16;
         RenderSystem.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE);
         for (int i = 0; i < chant.size(); i++) {
-            float flicker = 0.75f + 0.05f * (float) Math.sin(Math.toRadians(12 * ClientInfo.getClientPartialTicks() - 360.0f * i / chant.size()));
+            float flicker = 0.75f + 0.05f * (float) Math.sin(Math.toRadians(12 * pticks - 360.0f * i / chant.size()));
             Sign sign = chant.get(i);
             RenderUtil.litQuad(mStack.pose(), buffersource, bgx + 4, y + 4, 16, 16,
                     sign.getRed() * flicker, sign.getGreen() * flicker, sign.getBlue() * flicker, Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(sign.getSprite()));
