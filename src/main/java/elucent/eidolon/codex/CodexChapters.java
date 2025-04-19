@@ -1,5 +1,6 @@
 package elucent.eidolon.codex;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import elucent.eidolon.capability.Facts;
@@ -35,7 +36,7 @@ import static elucent.eidolon.Eidolon.prefix;
 
 public class CodexChapters {
     static public final List<Category> categories = new CopyOnWriteArrayList<>();
-    static public final Map<Item, Chapter> itemToEntryMap = new ConcurrentHashMap<>();
+    static public final Map<Item, IndexEntry> itemToEntryMap = new ConcurrentHashMap<>();
 
     public static Category NATURE, RITUALS, ARTIFICE, THEURGY, SIGNS, SPELLS;
 
@@ -918,7 +919,7 @@ public class CodexChapters {
 
         var docEntry = itemToEntryMap.get(stack.getItem());
 
-        if (docEntry == null) {
+        if (docEntry == null || docEntry.chapter == null || !docEntry.isUnlocked()) {
             return;
         }
         boolean hasSpellBook = false;
@@ -940,7 +941,7 @@ public class CodexChapters {
             }
         }
 
-        if (mc.screen instanceof CodexGui pageHolderScreen && pageHolderScreen.currentChapter == docEntry) {
+        if (mc.screen instanceof CodexGui pageHolderScreen && pageHolderScreen.currentChapter == docEntry.chapter) {
             return;
         }
 
@@ -950,8 +951,9 @@ public class CodexChapters {
         graphics.fill(x - 4, tooltipY - 4, x + 20, tooltipY + 26, 0x44000000);
         graphics.fill(x - 6, tooltipY - 6, x + 22, tooltipY + 28, 0x44000000);
 
-        //TODO Custom keybind
-        if (Screen.hasControlDown()) {
+        boolean boundToControl = EidolonKeybindings.OPEN_BOOK.getKey().getValue() == 341;
+        if (boundToControl ? Screen.hasControlDown() :
+                InputConstants.isKeyDown(Minecraft.getInstance().getWindow().getWindow(), EidolonKeybindings.OPEN_BOOK.getKey().getValue())) {
             lexiconLookupTime += ClientInfo.deltaTicks;
             oldMouseX = mouseX;
             oldMouseY = mouseY;
@@ -984,7 +986,7 @@ public class CodexChapters {
             RenderSystem.disableBlend();
 
             if (lexiconLookupTime >= time) {
-                CodexGui.openToEntry(docEntry, 0);
+                CodexGui.openToEntry(docEntry.chapter, 0);
                 lexiconLookupTime = 0F;
             }
         } else {
@@ -1010,7 +1012,7 @@ public class CodexChapters {
 
         ms.scale(0.5F, 0.5F, 1F);
         boolean mac = Minecraft.ON_OSX;
-        Component key = (mac ? Component.literal("Cmd") : Component.literal("Ctrl"))
+        Component key = (boundToControl ? (mac ? Component.literal("Cmd") : Component.literal("Ctrl")) : EidolonKeybindings.OPEN_BOOK.getTranslatedKeyMessage().copy())
                 .withStyle(ChatFormatting.BOLD);
         graphics.drawString(mc.font, key, (x + 10) * 2 - 16, (tooltipY + 8) * 2 + 20, 0xFFFFFFFF);
         ms.popPose();

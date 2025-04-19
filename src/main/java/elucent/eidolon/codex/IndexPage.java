@@ -38,7 +38,7 @@ public class IndexPage extends Page {
             this.icon = icon;
             // Only add to the map if the icon is from this mod
             if (RegistryUtil.getRegistryName(icon.getItem()).getNamespace().equals(Eidolon.MODID))
-                CodexChapters.itemToEntryMap.put(icon.getItem(), chapter);
+                CodexChapters.itemToEntryMap.put(icon.getItem(), this);
         }
 
         public IndexEntry(Chapter chapter, ItemStack icon, boolean alwaysRender) {
@@ -110,7 +110,7 @@ public class IndexPage extends Page {
         public boolean isUnlocked() {
             MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
             if (server == null) return true;
-            return server.overworld().getCapability(IReputation.INSTANCE).resolve().get().getReputation(Eidolon.proxy.getPlayer(), deity) >= reputation;
+            return server.overworld().getCapability(IReputation.INSTANCE).resolve().map(iReputation -> iReputation.getReputation(Eidolon.proxy.getPlayer(), deity) >= reputation).orElse(true);
         }
     }
 

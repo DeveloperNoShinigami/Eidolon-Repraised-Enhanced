@@ -860,5 +860,7 @@
   "eidolon.ritual.purify": "Purification",
   "eidolon.ritual.location": "Locator: %s",
   "eidolon.ritual.recharging_soulfire": "Recharging Soulfire",
-  "eidolon.ritual.recharging_chill": "Recharging Bonechill"
+  "eidolon.ritual.recharging_chill": "Recharging Bonechill",
+  "key.eidolon.open_docs": "Open Codex",
+  "key.categories.eidolon": "Eidolon:Repraised"
 }
