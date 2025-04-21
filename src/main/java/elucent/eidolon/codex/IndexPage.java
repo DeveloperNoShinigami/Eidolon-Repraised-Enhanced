@@ -83,16 +83,16 @@ public class IndexPage extends Page {
     }
 
     public static class ResearchLockedEntry extends IndexEntry {
-        final Research[] researchs;
+        final Research[] researches;
 
-        public ResearchLockedEntry(Chapter chapter, ItemStack icon, Research... researchs) {
+        public ResearchLockedEntry(Chapter chapter, ItemStack icon, Research... researches) {
             super(chapter, icon);
-            this.researchs = researchs;
+            this.researches = researches;
         }
 
         @Override
         public boolean isUnlocked() {
-            return Arrays.stream(researchs).allMatch((research) -> KnowledgeUtil.knowsResearch(Eidolon.proxy.getPlayer(), research.getRegistryName()));
+            return Arrays.stream(researches).allMatch((research) -> KnowledgeUtil.knowsResearch(Eidolon.proxy.getPlayer(), research.getRegistryName()));
         }
     }
 

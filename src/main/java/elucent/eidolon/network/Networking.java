@@ -1,6 +1,7 @@
 package elucent.eidolon.network;
 
 import elucent.eidolon.Eidolon;
+import elucent.eidolon.codex.CodexChapters;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -213,6 +214,18 @@ public class Networking {
 
         INSTANCE.registerMessage(
                 ++id,
+                initCodexPacket.class,
+                (obj, buffer) -> {
+                },
+                buffer -> new initCodexPacket(),
+                (obj, ctx) -> {
+                    ctx.get().enqueueWork(CodexChapters::init);
+                    ctx.get().setPacketHandled(true);
+                }
+        );
+
+        INSTANCE.registerMessage(
+                ++id,
                 InscribePacket.class,
                 InscribePacket::encode,
                 InscribePacket::decode,
@@ -234,5 +247,8 @@ public class Networking {
 
     public static <MSG> void sendToServer(MSG msg) {
         Networking.INSTANCE.sendToServer(msg);
+    }
+
+    public record initCodexPacket() {
     }
 }
