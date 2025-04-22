@@ -4,7 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import elucent.eidolon.Eidolon;
-import elucent.eidolon.event.ClientEvents;
+import elucent.eidolon.util.ClientInfo;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.BookModel;
 import net.minecraft.client.model.geom.ModelLayers;
@@ -30,7 +30,7 @@ public class SoulEnchanterTileRenderer implements BlockEntityRenderer<SoulEnchan
     public void render(SoulEnchanterTileEntity tileEntityIn, float partialTicks, PoseStack matrixStackIn, @NotNull MultiBufferSource bufferIn, int combinedLightIn, int combinedOverlayIn) {
         matrixStackIn.pushPose();
         matrixStackIn.translate(0.5D, 0.75D, 0.5D);
-        float f = ClientEvents.getClientTicks() / 5;
+        float f = ClientInfo.getClientPartialTicks() / 5;
         matrixStackIn.translate(0.0D, 0.1F + Mth.sin(f * 0.1F) * 0.01F, 0.0D);
 
         float f1;

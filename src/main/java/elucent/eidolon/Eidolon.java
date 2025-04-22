@@ -3,15 +3,11 @@ package elucent.eidolon;
 import com.google.common.collect.ImmutableSet;
 import elucent.eidolon.client.ClientConfig;
 import elucent.eidolon.client.ClientRegistry;
-import elucent.eidolon.codex.CodexChapters;
 import elucent.eidolon.common.item.AthameItem;
 import elucent.eidolon.common.tile.*;
 import elucent.eidolon.compat.CompatHandler;
 import elucent.eidolon.event.Events;
-import elucent.eidolon.gui.ResearchTableScreen;
-import elucent.eidolon.gui.SoulEnchanterScreen;
-import elucent.eidolon.gui.WoodenBrewingStandScreen;
-import elucent.eidolon.gui.WorktableScreen;
+import elucent.eidolon.gui.*;
 import elucent.eidolon.mixin.BlockEntityTypeAccessor;
 import elucent.eidolon.network.Networking;
 import elucent.eidolon.proxy.ClientProxy;
@@ -39,6 +35,7 @@ import net.minecraftforge.client.event.RegisterGuiOverlaysEvent;
 import net.minecraftforge.client.gui.overlay.VanillaGuiOverlay;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.SpawnPlacementRegisterEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.DistExecutor;
@@ -151,12 +148,11 @@ public class Eidolon {
         BlockEntityRenderers.register(Registry.CENSER_TILE_ENTITY.get(), (trd) -> new CenserRenderer());
 
         event.enqueueWork(() -> {
-            CodexChapters.init();
-
             MenuScreens.register(Registry.WORKTABLE_CONTAINER.get(), WorktableScreen::new);
             MenuScreens.register(Registry.SOUL_ENCHANTER_CONTAINER.get(), SoulEnchanterScreen::new);
             MenuScreens.register(Registry.WOODEN_STAND_CONTAINER.get(), WoodenBrewingStandScreen::new);
             MenuScreens.register(Registry.RESEARCH_TABLE_CONTAINER.get(), ResearchTableScreen::new);
+            MenuScreens.register(Registry.SCRIPTORIUM_CONTAINER.get(), ScriptoriumScreen::new);
 
             ClientRegistry.initCurios();
 
@@ -170,6 +166,7 @@ public class Eidolon {
                 e.setCancellationResult(result);
             }
         });
+        MinecraftForge.EVENT_BUS.addListener((PlayerEvent.PlayerLoggedInEvent e) -> Networking.sendTo(e.getEntity(), new Networking.initCodexPacket()));
     }
 
     @OnlyIn(Dist.CLIENT)

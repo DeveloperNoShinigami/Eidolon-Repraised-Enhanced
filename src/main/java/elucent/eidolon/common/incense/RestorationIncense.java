@@ -30,7 +30,7 @@ public class RestorationIncense extends IncenseRitual {
             assert level != null;
             for (LivingEntity entity : level.getEntitiesOfClass(LivingEntity.class, new AABB(pos).inflate(10))) {
                 if (entity.getMobType() == MobType.UNDEAD) {
-                    entity.addEffect(new MobEffectInstance(MobEffects.WITHER, 200, 1));
+                    entity.addEffect(new MobEffectInstance(MobEffects.WITHER, 20 * 10, 1));
                 } else {
                     entity.heal(1);
                 }

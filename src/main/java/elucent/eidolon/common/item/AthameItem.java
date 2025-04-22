@@ -149,6 +149,7 @@ public class AthameItem extends SwordItem {
         harvestables.put(Registry.OANNA_BLOOM.get(), new ItemStack(Registry.OANNA_BLOOM.get()));
         harvestables.put(Registry.SILDRIAN_SEED.get(), new ItemStack(Registry.SILDRIAN_SEED.get()));
         harvestables.put(Registry.AVENNIAN_SPRIG.get(), new ItemStack(Registry.AVENNIAN_SPRIG.get()));
+        harvestables.put(Registry.MIRECAP.get(), new ItemStack(Registry.MIRECAP.get()));
     }
 
     public static ItemStack getHarvestable(Block block, Level level) {

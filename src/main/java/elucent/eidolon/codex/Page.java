@@ -44,12 +44,7 @@ public abstract class Page {
         if (ingredient.isEmpty()) return;
         ItemStack[] items = ingredient.getItems();
         ItemStack stack = items[((int) Eidolon.proxy.getWorld().getGameTime() / 20) % items.length];
-        guiGraphics.renderItem(stack, x, y);
-        var font = Minecraft.getInstance().font;
-        guiGraphics.renderItemDecorations(font, stack, x, y, null);
-        if (mouseX >= x && mouseY >= y && mouseX <= x + 16 && mouseY <= y + 16) {
-            guiGraphics.renderTooltip(font, stack, mouseX, mouseY);
-        }
+        drawItem(guiGraphics, stack, x, y, mouseX, mouseY);
     }
 
     @OnlyIn(Dist.CLIENT)
@@ -62,23 +57,50 @@ public abstract class Page {
         guiGraphics.drawString(font, text, x, y, ColorUtil.packColor(255, 79, 59, 47), false);
     }
 
-    @OnlyIn(Dist.CLIENT)
-    public static void drawWrappingText(GuiGraphics mStack, String text, int x, int y, int w) {
+    public static List<String> wrapTextToLines(String text, int maxWidth) {
         Font font = Minecraft.getInstance().font;
         List<String> lines = new ArrayList<>();
         String[] words = text.split(" ");
         String line = "";
-        for (String s : words) {
-            if (font.width(line) + font.width(s) > w) {
-                lines.add(line);
-                line = s + " ";
-            } else line += s + " ";
+
+        for (String word : words) {
+            if (font.width(line) + font.width(word) > maxWidth) {
+                lines.add(line.trim());  // Trim the trailing space
+                line = word + " ";
+            } else {
+                line += word + " ";
+            }
         }
-        if (!line.isEmpty()) lines.add(line);
-        for (int i = 0; i < lines.size(); i++) {
-            drawText(mStack, lines.get(i), x, y + i * (font.lineHeight + 1));
+
+        // Add the final line if it exists
+        if (!line.isEmpty()) {
+            lines.add(line.trim());
+        }
+
+        return lines;
+    }
+
+
+    @OnlyIn(Dist.CLIENT)
+    public static void drawWrappingText(GuiGraphics mStack, String text, int x, int y, int w) {
+        Font font = Minecraft.getInstance().font;
+
+        // Split text into sentences first (to handle punctuation-based breaks)
+        String[] sentences = text.split("(?<=[.!?])\\s+");
+
+        // Now, wrap each sentence to fit within the specified width (w)
+        List<String> wrappedLines = new ArrayList<>();
+        for (String sentence : sentences) {
+            List<String> sentenceLines = wrapTextToLines(sentence, w);
+            wrappedLines.addAll(sentenceLines);
+        }
+
+        // Now, render the wrapped lines
+        for (int i = 0; i < wrappedLines.size(); i++) {
+            drawText(mStack, wrappedLines.get(i), x, y + i * (font.lineHeight + 1));  // Add some padding between lines
         }
     }
+
 
     @OnlyIn(Dist.CLIENT)
     public void fullRender(CodexGui gui, GuiGraphics mStack, int x, int y, int mouseX, int mouseY) {
@@ -107,7 +129,7 @@ public abstract class Page {
     }
 
     @OnlyIn(Dist.CLIENT)
-    static void colorBlit(PoseStack mStack, int x, int y, int uOffset, int vOffset, int width, int height, int textureWidth, int textureHeight, int color) {
+    public static void colorBlit(PoseStack mStack, int x, int y, int uOffset, int vOffset, int width, int height, int textureWidth, int textureHeight, int color) {
         Matrix4f matrix = mStack.last().pose();
         int maxX = x + width, maxY = y + height;
         float minU = (float) uOffset / textureWidth, minV = (float) vOffset / textureHeight;

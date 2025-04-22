@@ -6,6 +6,7 @@ import elucent.eidolon.api.research.Research;
 import elucent.eidolon.api.spells.Sign;
 import elucent.eidolon.capability.IReputation;
 import elucent.eidolon.util.KnowledgeUtil;
+import elucent.eidolon.util.RegistryUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.resources.language.I18n;
@@ -35,6 +36,9 @@ public class IndexPage extends Page {
         public IndexEntry(Chapter chapter, ItemStack icon) {
             this.chapter = chapter;
             this.icon = icon;
+            // Only add to the map if the icon is from this mod
+            if (RegistryUtil.getRegistryName(icon.getItem()).getNamespace().equals(Eidolon.MODID))
+                CodexChapters.itemToEntryMap.put(icon.getItem(), this);
         }
 
         public IndexEntry(Chapter chapter, ItemStack icon, boolean alwaysRender) {
@@ -79,16 +83,16 @@ public class IndexPage extends Page {
     }
 
     public static class ResearchLockedEntry extends IndexEntry {
-        final Research[] researchs;
+        final Research[] researches;
 
-        public ResearchLockedEntry(Chapter chapter, ItemStack icon, Research... researchs) {
+        public ResearchLockedEntry(Chapter chapter, ItemStack icon, Research... researches) {
             super(chapter, icon);
-            this.researchs = researchs;
+            this.researches = researches;
         }
 
         @Override
         public boolean isUnlocked() {
-            return Arrays.stream(researchs).allMatch((research) -> KnowledgeUtil.knowsResearch(Eidolon.proxy.getPlayer(), research.getRegistryName()));
+            return Arrays.stream(researches).allMatch((research) -> KnowledgeUtil.knowsResearch(Eidolon.proxy.getPlayer(), research.getRegistryName()));
         }
     }
 
@@ -106,7 +110,7 @@ public class IndexPage extends Page {
         public boolean isUnlocked() {
             MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
             if (server == null) return true;
-            return server.overworld().getCapability(IReputation.INSTANCE).resolve().get().getReputation(Eidolon.proxy.getPlayer(), deity) >= reputation;
+            return server.overworld().getCapability(IReputation.INSTANCE).resolve().map(iReputation -> iReputation.getReputation(Eidolon.proxy.getPlayer(), deity) >= reputation).orElse(true);
         }
     }
 

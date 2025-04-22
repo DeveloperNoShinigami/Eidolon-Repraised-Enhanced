@@ -39,6 +39,7 @@ public class AltarEntries {
         entries.put(Blocks.POTTED_WARPED_FUNGUS, new AltarEntry(AltarKeys.PLANT_KEY).setPower(2));
         entries.put(Blocks.POTTED_CRIMSON_FUNGUS, new AltarEntry(AltarKeys.PLANT_KEY).setPower(2));
         entries.put(Blocks.POTTED_WITHER_ROSE, new AltarEntry(AltarKeys.PLANT_KEY).setPower(3));
+        //entries.put(Registry.POTTED_MIRECAP.get(), new AltarEntry(AltarKeys.PLANT_KEY).setPower(2));
         entries.put(Registry.GOBLET.get(), new AltarEntry(AltarKeys.OFFERS_KEY).setCapacity(2));
         entries.put(Registry.CENSER.get(), new AltarEntry(AltarKeys.OFFERS_KEY).setCapacity(2));
 

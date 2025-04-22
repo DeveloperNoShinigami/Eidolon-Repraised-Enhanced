@@ -105,6 +105,11 @@ public class RitualCategory implements IRecipeCategory<RitualRecipe> {
         RitualPage.rearrangeIngredients(recipe, inputs);
 
         Ritual ritual = recipe.getRitualWithRequirements();
+
+        var name = ritual.getName();
+        var font = Minecraft.getInstance().font;
+        guiGraphics.drawString(font, name, x + 69 - font.width(name) / 2, y + 5, 0, false);
+
         float angleStep = Math.min(30, 180 / inputs.size());
         double rootAngle = 90 - (inputs.size() - 1) * angleStep / 2;
         for (int i = 0; i < inputs.size(); i++) {
@@ -123,7 +128,7 @@ public class RitualCategory implements IRecipeCategory<RitualRecipe> {
         }
 
         ritual.getRequirements().stream().filter(HealthRequirement.class::isInstance).map(HealthRequirement.class::cast).findFirst().ifPresent(
-                healthRequirement -> guiGraphics.drawString(Minecraft.getInstance().font, Component.translatable("eidolon.jei.health_sacrifice", healthRequirement.getHealth() / 2), x + 8, y + 5, 0xFF0000, false)
+                healthRequirement -> guiGraphics.drawString(font, Component.translatable("eidolon.jei.health_sacrifice", healthRequirement.getHealth() / 2), x + 8, y + 150, 0xFF0000, false)
         );
 
         renderRitualSymbol(guiGraphics, x, y, ritual);

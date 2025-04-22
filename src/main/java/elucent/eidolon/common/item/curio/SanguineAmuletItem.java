@@ -1,8 +1,8 @@
 package elucent.eidolon.common.item.curio;
 
 import com.mojang.datafixers.util.Either;
+import elucent.eidolon.common.item.ChantScrollItem;
 import elucent.eidolon.registries.Registry;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
@@ -57,16 +57,16 @@ public class SanguineAmuletItem extends EidolonCurio {
         LivingEntity entity = slotContext.entity();
         if (!entity.level().isClientSide) {
             if (entity.tickCount % 80 == 0 &&
-                entity.getHealth() >= entity.getMaxHealth() - 0.0001 &&
-                entity instanceof Player player && player.getFoodData().getFoodLevel() >= 18 &&
-                getCharge(stack) < 40) {
+                    entity.getHealth() >= entity.getMaxHealth() - 0.0001 &&
+                    entity instanceof Player player && player.getFoodData().getFoodLevel() >= 18 &&
+                    getCharge(stack) < 40) {
                 float f = player.getFoodData().getSaturationLevel() > 0 ?
                         Math.min(4 * player.getFoodData().getSaturationLevel(), 16.0F) : 4.0f;
                 player.causeFoodExhaustion(f);
                 addCharge(stack, 1);
             }
             if (entity.tickCount % 10 == 0 &&
-                getCharge(stack) > 0 && entity.getHealth() < entity.getMaxHealth()) {
+                    getCharge(stack) > 0 && entity.getHealth() < entity.getMaxHealth()) {
                 int taken = (int) Math.min(1, entity.getMaxHealth() - entity.getHealth());
                 addCharge(stack, -taken);
                 entity.heal(taken);
@@ -94,14 +94,7 @@ public class SanguineAmuletItem extends EidolonCurio {
     }
 
 
-    public static class SanguineAmuletTooltipInfo implements TooltipComponent {
-        final ItemStack stack;
-        final int maxWidth;
-
-        public SanguineAmuletTooltipInfo(ItemStack stack, int maxWidth) {
-            this.stack = stack;
-            this.maxWidth = maxWidth;
-        }
+    public record SanguineAmuletTooltipInfo(ItemStack stack, int maxWidth) implements TooltipComponent {
     }
 
     public static class SanguineAmuletTooltipComponent implements ClientTooltipComponent {
@@ -127,9 +120,7 @@ public class SanguineAmuletItem extends EidolonCurio {
 
         @Override
         public void renderImage(@NotNull Font font, int x, int y, @NotNull GuiGraphics pGuiGraphics) {
-            Minecraft mc = Minecraft.getInstance();
             int charge = getCharge(stack);
-            int rows = (charge + 19) / 20;
             for (int i = 0; i < charge; i += 20) {
                 for (int j = 0; j < Mth.clamp(charge - i, 0, 20); j += 2) {
                     if (charge - (i + j) == 1) {
@@ -147,6 +138,8 @@ public class SanguineAmuletItem extends EidolonCurio {
         ItemStack stack = event.getItemStack();
         if (stack.getItem() == Registry.SANGUINE_AMULET.get()) {
             event.getTooltipElements().add(Either.right(new SanguineAmuletTooltipInfo(stack, event.getMaxWidth())));
+        } else if (stack.getItem() == Registry.CHANT_SCROLL.get()) {
+            event.getTooltipElements().add(Either.right(new ChantScrollItem.ChantTooltipInfo(stack, event.getMaxWidth())));
         }
     }
 }

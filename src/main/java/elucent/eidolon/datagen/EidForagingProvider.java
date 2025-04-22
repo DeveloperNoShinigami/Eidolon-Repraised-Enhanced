@@ -42,6 +42,7 @@ public class EidForagingProvider extends SimpleDataProvider {
         addForaging(Registry.OANNA_BLOOM.get(), Blocks.LILY_PAD);
         addForaging(Registry.MERAMMER_ROOT.get(), Blocks.OXEYE_DAISY, Blocks.LILY_OF_THE_VALLEY, Blocks.WHITE_TULIP);
         addForaging(Registry.AVENNIAN_SPRIG.get(), Blocks.FERN, Blocks.LARGE_FERN);
+        addForaging(Registry.MIRECAP.get(), Blocks.CRIMSON_FUNGUS, Blocks.WARPED_FUNGUS);
 
     }
 

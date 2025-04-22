@@ -7,8 +7,8 @@ import elucent.eidolon.Eidolon;
 import elucent.eidolon.api.spells.Sign;
 import elucent.eidolon.capability.IKnowledge;
 import elucent.eidolon.client.ClientRegistry;
-import elucent.eidolon.event.ClientEvents;
 import elucent.eidolon.registries.EidolonSounds;
+import elucent.eidolon.util.ClientInfo;
 import elucent.eidolon.util.RenderUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -70,6 +70,9 @@ public class SignIndexPage extends Page {
     @OnlyIn(Dist.CLIENT)
     public void render(CodexGui gui, @NotNull GuiGraphics guiGraphics, ResourceLocation bg, int x, int y, int mouseX, int mouseY) {
         Player entity = Minecraft.getInstance().player;
+        if (entity == null) {
+            return;
+        }
         IKnowledge knowledge = entity.getCapability(IKnowledge.INSTANCE, null).resolve().get();
         var mStack = guiGraphics.pose();
         for (int i = 0; i < entries.size(); i++) {
@@ -87,7 +90,7 @@ public class SignIndexPage extends Page {
                 if (hover && !infoHover) {
                     mStack.pushPose();
                     mStack.translate(xx + 24, yy + 24, 0);
-                    mStack.mulPose(Axis.ZP.rotationDegrees(ClientEvents.getClientTicks() * 1.5f));
+                    mStack.mulPose(Axis.ZP.rotationDegrees(ClientInfo.getClientPartialTicks() * 1.5f));
                     colorBlit(mStack, -18, -18, 128, 48, 36, 36, 256, 256, sign.getColor());
                     mStack.popPose();
                 }

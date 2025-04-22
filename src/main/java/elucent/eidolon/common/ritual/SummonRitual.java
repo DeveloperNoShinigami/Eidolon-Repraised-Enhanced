@@ -6,10 +6,15 @@ import elucent.eidolon.network.CrystallizeEffectPacket;
 import elucent.eidolon.network.Networking;
 import elucent.eidolon.util.ColorUtil;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.ServerLevelAccessor;
+import net.minecraftforge.event.ForgeEventFactory;
 
 public class SummonRitual extends Ritual {
     public static final ResourceLocation SYMBOL = new ResourceLocation(Eidolon.MODID, "particle/summon_ritual");
@@ -39,6 +44,11 @@ public class SummonRitual extends Ritual {
     }
 
     @Override
+    public Component getName() {
+        return Component.translatable(Eidolon.MODID + ".ritual" + ".summon", getEntityType().getDescription());
+    }
+
+    @Override
     public Ritual cloneRitual() {
         return new SummonRitual(entity, count);
     }
@@ -50,6 +60,10 @@ public class SummonRitual extends Ritual {
             for (int i = 0; i < count; i++) {
                 Entity e = entity.create(world);
                 if (e == null) continue;
+                if (e instanceof Mob m && world instanceof ServerLevelAccessor l) {
+                    ForgeEventFactory.onFinalizeSpawn(m, l, world.getCurrentDifficultyAt(pos), MobSpawnType.MOB_SUMMONED, null, null);
+                    m.setCanPickUpLoot(true);
+                }
                 e.setPos(pos.getX() + 0.5, pos.getY() + 1.5, pos.getZ() + 0.5);
                 world.addFreshEntity(e);
             }

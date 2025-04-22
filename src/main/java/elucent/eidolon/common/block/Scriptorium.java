@@ -1,6 +1,7 @@
 package elucent.eidolon.common.block;
 
 import elucent.eidolon.common.tile.ScriptoriumTile;
+import elucent.eidolon.registries.Registry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
@@ -30,9 +31,8 @@ public class Scriptorium extends HorizontalBlockBase implements EntityBlock {
         if (worldIn.isClientSide) {
             return InteractionResult.SUCCESS;
         } else {
-            BlockEntity tileentity = worldIn.getBlockEntity(pos);
-            if (tileentity instanceof ScriptoriumTile scriptorium) {
-                NetworkHooks.openScreen((ServerPlayer) player, new SimpleMenuProvider((id, inventory, p) -> null, Component.translatable("eidolon.gui.scriptorium")), pos);
+            if (worldIn.getBlockEntity(pos) instanceof ScriptoriumTile tile && player.getItemInHand(handIn).getItem() == Registry.CHANT_SCROLL.get()) {
+                NetworkHooks.openScreen((ServerPlayer) player, new SimpleMenuProvider(tile, Component.translatable("eidolon.gui.scriptorium")), pos);
             }
 
             return InteractionResult.CONSUME;
@@ -43,6 +43,5 @@ public class Scriptorium extends HorizontalBlockBase implements EntityBlock {
     public BlockEntity newBlockEntity(@NotNull BlockPos pos, @NotNull BlockState state) {
         return new ScriptoriumTile(pos, state);
     }
-
 
 }

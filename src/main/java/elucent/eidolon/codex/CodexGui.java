@@ -6,13 +6,14 @@ import elucent.eidolon.Eidolon;
 import elucent.eidolon.api.spells.Rune;
 import elucent.eidolon.api.spells.Sign;
 import elucent.eidolon.client.ClientRegistry;
-import elucent.eidolon.event.ClientEvents;
 import elucent.eidolon.network.AttemptCastPacket;
 import elucent.eidolon.network.Networking;
+import elucent.eidolon.util.ClientInfo;
 import elucent.eidolon.util.RenderUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -52,8 +53,22 @@ public class CodexGui extends Screen {
         lastChapter = currentChapter = CodexChapters.NATURE_INDEX;
     }
 
-    public static void blit(GuiGraphics guiGraphics, int i, int i1, int i2, int i3, int i4, int i5, int i6, int i7) {
-        guiGraphics.blit(CODEX_BACKGROUND, i, i1, i2, i3, i4, i5, i6, i7);
+    public static void blit(GuiGraphics guiGraphics, int pX, int pY, float pUOffset, float pVOffset, int pWidth, int pHeight, int pTextureWidth, int pTextureHeight) {
+        guiGraphics.blit(CODEX_BACKGROUND, pX, pY, pUOffset, pVOffset, pWidth, pHeight, pTextureWidth, pTextureHeight);
+    }
+
+    public static void openToEntry(Chapter docEntry, int i) {
+        if (docEntry == null) {
+            CodexGui.getInstance().onClose();
+            return;
+        }
+        if (Minecraft.getInstance().screen instanceof CodexGui codexGui && codexGui.currentChapter == docEntry) {
+            return;
+        }
+        CodexGui codexGui = getInstance();
+        codexGui.changeChapter(docEntry);
+        codexGui.currentPage = i;
+        Minecraft.getInstance().setScreen(codexGui);
     }
 
     protected void resetPages() {
@@ -113,7 +128,7 @@ public class CodexGui extends Screen {
         bgx = baseX + 16;
         RenderSystem.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE);
         for (int i = 0; i < chant.size(); i++) {
-            float flicker = 0.75f + 0.25f * (float) Math.sin(Math.toRadians(12 * ClientEvents.getClientTicks() - 360.0f * i / chant.size()));
+            float flicker = 0.75f + 0.25f * (float) Math.sin(Math.toRadians(12 * ClientInfo.getClientPartialTicks() - 360.0f * i / chant.size()));
             Sign sign = chant.get(i);
             RenderUtil.litQuad(mStack.pose(), buffersource, bgx + 4, baseY + 4, 16, 16,
                     sign.getRed() * flicker, sign.getGreen() * flicker, sign.getBlue() * flicker, Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(sign.getSprite()));
@@ -189,24 +204,17 @@ public class CodexGui extends Screen {
     }
 
     protected boolean interactChant(int x, int y, int mouseX, int mouseY) {
-        /*
-        int chantWidth = 32 + 12 * chant.size();
-        int baseX = x + xSize / 2 - chantWidth / 2, baseY = y + 180;
-        int bgx = baseX + chantWidth + 8;
-        boolean chantHover = mouseX >= bgx && mouseY >= baseY - 4 && mouseX <= bgx + 32 && mouseY <= baseY + 28;
-        bgx += 36;
-        boolean cancelHover = mouseX >= bgx && mouseY >= baseY - 4 && mouseX <= bgx + 32 && mouseY <= baseY + 28;
-        */
         int chantWidth = 32 + 24 * chant.size();
         int baseX = x + xSize / 2 - chantWidth / 2, baseY = y + 180;
         int bgx = baseX + chantWidth + 8;
         boolean chantHover = mouseX >= bgx && mouseY >= baseY - 4 && mouseX <= bgx + 32 && mouseY <= baseY + 28;
         bgx += 36;
         boolean cancelHover = mouseX >= bgx && mouseY >= baseY - 4 && mouseX <= bgx + 32 && mouseY <= baseY + 28;
+        Player player = Minecraft.getInstance().player;
+        Level world = Minecraft.getInstance().level;
+        if (player == null || world == null) return false;
+
         if (chantHover) {
-            Player player = Minecraft.getInstance().player;
-            Level world = Minecraft.getInstance().level;
-            if (player == null || world == null) return false;
             Networking.sendToServer(new AttemptCastPacket(player, chant));
             chant.clear();
             player.playNotifySound(SoundEvents.UI_BUTTON_CLICK.get(), SoundSource.NEUTRAL, 1.0f, 1.0f);
@@ -215,7 +223,7 @@ public class CodexGui extends Screen {
         }
         if (cancelHover) {
             chant.clear();
-            Minecraft.getInstance().player.playNotifySound(SoundEvents.UI_BUTTON_CLICK.get(), SoundSource.NEUTRAL, 1.0f, 1.0f);
+            player.playNotifySound(SoundEvents.UI_BUTTON_CLICK.get(), SoundSource.NEUTRAL, 1.0f, 1.0f);
             return true;
         }
         return false;
@@ -228,8 +236,10 @@ public class CodexGui extends Screen {
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        Minecraft mc = getMinecraft();
+        LocalPlayer player = mc.player;
+        if (player == null) return false;
         if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
-            Minecraft mc = Minecraft.getInstance();
             this.width = mc.getWindow().getGuiScaledWidth();
             this.height = mc.getWindow().getGuiScaledHeight();
             int guiLeft = (width - xSize) / 2, guiTop = (height - ySize) / 2;
@@ -238,7 +248,7 @@ public class CodexGui extends Screen {
                 int x = guiLeft + 10, y = guiTop + 169;
                 if (mouseX >= x && mouseY >= y && mouseX <= x + 32 && mouseY <= y + 16) {
                     currentPage -= 2;
-                    Minecraft.getInstance().player.playNotifySound(SoundEvents.BOOK_PAGE_TURN, SoundSource.NEUTRAL, 1.0f, 1.0f);
+                    player.playNotifySound(SoundEvents.BOOK_PAGE_TURN, SoundSource.NEUTRAL, 1.0f, 1.0f);
                     resetPages();
                     return true;
                 }
@@ -247,7 +257,7 @@ public class CodexGui extends Screen {
                 int x = guiLeft + 270, y = guiTop + 169;
                 if (mouseX >= x && mouseY >= y && mouseX <= x + 32 && mouseY <= y + 16) {
                     currentPage += 2;
-                    Minecraft.getInstance().player.playNotifySound(SoundEvents.BOOK_PAGE_TURN, SoundSource.NEUTRAL, 1.0f, 1.0f);
+                    player.playNotifySound(SoundEvents.BOOK_PAGE_TURN, SoundSource.NEUTRAL, 1.0f, 1.0f);
                     resetPages();
                     return true;
                 }
@@ -268,14 +278,14 @@ public class CodexGui extends Screen {
         } else if (button == GLFW.GLFW_MOUSE_BUTTON_RIGHT) {
             if (!chant.isEmpty() && currentChapter.get(currentPage) instanceof SignIndexPage) {
                 chant.remove(chant.size() - 1);
-                Minecraft.getInstance().player.playNotifySound(SoundEvents.UI_BUTTON_CLICK.get(), SoundSource.NEUTRAL, 1.0f, 1.0f);
+                player.playNotifySound(SoundEvents.UI_BUTTON_CLICK.get(), SoundSource.NEUTRAL, 1.0f, 1.0f);
                 return true;
             }
             //otherwise, if it's not an index page, go back to the index page
             if (!(currentChapter.get(currentPage) instanceof SignIndexPage)) {
                 currentChapter = lastChapter;
                 currentPage = 0;
-                Minecraft.getInstance().player.playNotifySound(SoundEvents.BOOK_PAGE_TURN, SoundSource.NEUTRAL, 1.0f, 1.0f);
+                player.playNotifySound(SoundEvents.BOOK_PAGE_TURN, SoundSource.NEUTRAL, 1.0f, 1.0f);
                 resetPages();
                 return true;
             }
@@ -286,17 +296,19 @@ public class CodexGui extends Screen {
 
     @Override
     public boolean mouseScrolled(double pMouseX, double pMouseY, double pDelta) {
+        LocalPlayer player = getMinecraft().player;
+        if (player == null) return false;
         if (pDelta < 0) {
             if (currentPage + 2 < currentChapter.size()) {
                 currentPage += 1;
-                Minecraft.getInstance().player.playNotifySound(SoundEvents.BOOK_PAGE_TURN, SoundSource.NEUTRAL, 1.0f, 1.0f);
+                player.playNotifySound(SoundEvents.BOOK_PAGE_TURN, SoundSource.NEUTRAL, 1.0f, 1.0f);
                 resetPages();
                 return true;
             }
         } else if (pDelta > 0) {
             if (currentPage > 0) {
                 currentPage -= 1;
-                Minecraft.getInstance().player.playNotifySound(SoundEvents.BOOK_PAGE_TURN, SoundSource.NEUTRAL, 1.0f, 1.0f);
+                player.playNotifySound(SoundEvents.BOOK_PAGE_TURN, SoundSource.NEUTRAL, 1.0f, 1.0f);
                 resetPages();
                 return true;
             }

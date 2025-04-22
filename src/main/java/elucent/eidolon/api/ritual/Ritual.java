@@ -2,6 +2,7 @@ package elucent.eidolon.api.ritual;
 
 import elucent.eidolon.util.ColorUtil;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -37,6 +38,10 @@ public abstract class Ritual implements Cloneable {
 
     public ResourceLocation getSymbol() {
         return this.symbol;
+    }
+
+    public Component getName() {
+        return Component.translatable(this.getRegistryName().getNamespace() + ".ritual." + this.getRegistryName().getPath());
     }
 
     public Ritual setRegistryName(String domain, String path) {

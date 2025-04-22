@@ -24,8 +24,8 @@ import org.jetbrains.annotations.NotNull;
 
 @SuppressWarnings("deprecation")
 public class HerbBlockBase extends BushBlock implements BonemealableBlock {
-    public static final IntegerProperty AGE = BlockStateProperties.AGE_2;
-    private static final VoxelShape[] SHAPES = new VoxelShape[]{Block.box(5, 0, 5, 11, 4, 11), Block.box(5, 0, 5, 11, 4, 11), Block.box(4, 0, 4, 12, 8, 12)};
+    public static final IntegerProperty AGE = BlockStateProperties.AGE_3;
+    private static final VoxelShape[] SHAPES = new VoxelShape[]{Block.box(5, 0, 5, 11, 4, 11), Block.box(5, 0, 5, 11, 4, 11), Block.box(4, 0, 4, 12, 8, 12), Block.box(4, 0, 4, 12, 8, 12)};
 
     public HerbBlockBase(BlockBehaviour.Properties builder) {
         super(builder);
@@ -53,15 +53,15 @@ public class HerbBlockBase extends BushBlock implements BonemealableBlock {
     }
 
     @Override
-    public boolean isRandomlyTicking(BlockState state) {
-        return state.getValue(AGE) < 2;
+    public boolean isRandomlyTicking(@NotNull BlockState state) {
+        return canGrow(state);
     }
 
     @Override
     public void randomTick(@NotNull BlockState pState, @NotNull ServerLevel worldIn, @NotNull BlockPos pos, @NotNull RandomSource random) {
         int i = this.getAge(pState);
         if (i < this.getMaxAge() && mayPlaceOn(worldIn.getBlockState(pos.below()), worldIn, pos.below())
-            && net.minecraftforge.common.ForgeHooks.onCropsGrowPre(worldIn, pos, pState, random.nextInt(20) == 0)) {
+                && net.minecraftforge.common.ForgeHooks.onCropsGrowPre(worldIn, pos, pState, random.nextInt(20) == 0)) {
             growCrops(worldIn, pos, pState);
             net.minecraftforge.common.ForgeHooks.onCropsGrowPost(worldIn, pos, pState);
         }
@@ -87,11 +87,11 @@ public class HerbBlockBase extends BushBlock implements BonemealableBlock {
     }
 
     private int getMaxAge() {
-        return 2;
+        return 3;
     }
 
-    private boolean isMaxAge(BlockState pState) {
-        return pState.getValue(AGE) >= this.getMaxAge();
+    private boolean canGrow(BlockState pState) {
+        return pState.getValue(AGE) < this.getMaxAge();
     }
 
     protected BlockState getStateForAge(int pAge) {
@@ -99,7 +99,7 @@ public class HerbBlockBase extends BushBlock implements BonemealableBlock {
     }
 
     public boolean isValidBonemealTarget(@NotNull LevelReader pLevel, @NotNull BlockPos pPos, @NotNull BlockState pState, boolean pIsClient) {
-        return !this.isMaxAge(pState);
+        return this.canGrow(pState);
     }
 
     public boolean isBonemealSuccess(@NotNull Level pLevel, @NotNull RandomSource pRandom, @NotNull BlockPos pPos, @NotNull BlockState pState) {

@@ -6,7 +6,9 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import elucent.eidolon.Eidolon;
 import elucent.eidolon.capability.IPlayerData;
 import elucent.eidolon.client.ClientConfig;
+import elucent.eidolon.codex.CodexChapters;
 import elucent.eidolon.common.item.IWingsItem;
+import elucent.eidolon.util.ClientInfo;
 import elucent.eidolon.util.RenderUtil;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.player.LocalPlayer;
@@ -18,6 +20,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.RenderLevelStageEvent;
+import net.minecraftforge.client.event.RenderTooltipEvent;
 import net.minecraftforge.event.TickEvent.PlayerTickEvent;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
@@ -59,15 +62,12 @@ public class ClientEvents {
     }
 
     @OnlyIn(Dist.CLIENT)
-    static float clientTicks = 0;
-
-    @OnlyIn(Dist.CLIENT)
     public static Matrix4f particleMVMatrix = null;
 
     @OnlyIn(Dist.CLIENT)
     public static void onRenderLast() {
+        ClientInfo.renderTickEnd();
         if (ClientConfig.BETTER_LAYERING.get()) {
-
             PoseStack viewStack = RenderSystem.getModelViewStack();
             viewStack.pushPose(); // this feels...cheaty
             viewStack.setIdentity();
@@ -89,14 +89,11 @@ public class ClientEvents {
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public static void onRenderStages(final RenderLevelStageEvent event) {
+        if (event.getStage() == RenderLevelStageEvent.Stage.AFTER_SKY)
+            ClientInfo.renderTickStart(event.getPartialTick());
         if (event.getStage() == RenderLevelStageEvent.Stage.AFTER_LEVEL) onRenderLast();
         if (event.getStage() == RenderLevelStageEvent.Stage.AFTER_TRIPWIRE_BLOCKS)
-            clientTicks += event.getPartialTick();
-    }
-
-    @OnlyIn(Dist.CLIENT)
-    public static float getClientTicks() {
-        return clientTicks;
+            ClientInfo.clientTicks += event.getPartialTick();
     }
 
     public static int jumpTicks = 0;
@@ -126,6 +123,10 @@ public class ClientEvents {
         }
     }
 
+    @SubscribeEvent
+    public static void TooltipEvent(RenderTooltipEvent.Pre e) {
+        CodexChapters.onTooltip(e.getGraphics(), e.getItemStack(), e.getX(), e.getY());
+    }
     @OnlyIn(Dist.CLIENT)
     @SubscribeEvent
     public static void tooltip(ItemTooltipEvent event) {

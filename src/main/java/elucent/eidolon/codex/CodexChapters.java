@@ -1,25 +1,44 @@
 package elucent.eidolon.codex;
 
+import com.mojang.blaze3d.platform.InputConstants;
+import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.*;
 import elucent.eidolon.capability.Facts;
 import elucent.eidolon.codex.IndexPage.*;
 import elucent.eidolon.codex.ListPage.ListEntry;
 import elucent.eidolon.codex.SignIndexPage.SignEntry;
 import elucent.eidolon.common.deity.Deities;
+import elucent.eidolon.common.item.CodexItem;
 import elucent.eidolon.registries.*;
+import elucent.eidolon.util.ClientInfo;
 import elucent.eidolon.util.ColorUtil;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.alchemy.PotionUtils;
 import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.level.block.Blocks;
+import org.lwjgl.opengl.GL11;
 
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import static elucent.eidolon.Eidolon.prefix;
 
 public class CodexChapters {
+
     static public final List<Category> categories = new CopyOnWriteArrayList<>();
+    static public final Map<Item, IndexEntry> itemToEntryMap = new ConcurrentHashMap<>();
+
     public static Category NATURE, RITUALS, ARTIFICE, THEURGY, SIGNS, SPELLS;
 
     public static Index NATURE_INDEX, RITUALS_INDEX, ARTIFICE_INDEX, THEURGY_INDEX, SIGNS_INDEX, SPELLS_INDEX;
@@ -32,86 +51,92 @@ public class CodexChapters {
 
     public static void init() {
 
+        // purge old categories
+        if (!categories.isEmpty()) {
+            CodexGui.INSTANCE = null;
+            categories.clear();
+            itemToEntryMap.clear();
+        }
         //NATURE
         {
-            MONSTERS = new Chapter(
-                    "eidolon.codex.chapter.monsters",
-                    new TitlePage("eidolon.codex.page.monsters.zombie_brute"),
-                    new EntityPage(EidolonEntities.ZOMBIE_BRUTE.get()),
-                    new TitlePage("eidolon.codex.page.monsters.wraith"),
-                    new EntityPage(EidolonEntities.WRAITH.get()),
-                    new TitlePage("eidolon.codex.page.monsters.chilled"),
-                    new TextPage(""),
-                    new EntityPage(EidolonEntities.GIANT_SKEL.get()),
-                    new TitlePage("eidolon.codex.page.monsters.giant_skeleton"),
-                    new EntityPage(EidolonEntities.NECROMANCER.get()),
-                    new TitlePage("eidolon.codex.page.monsters.necromancer")
-            );
+            MONSTERS = new CodexBuilder()
+                    .title("eidolon.codex.chapter.monsters")
+                    .titlePage("eidolon.codex.page.monsters.zombie_brute")
+                    .entityPage(EidolonEntities.ZOMBIE_BRUTE.get())
+                    .titlePage("eidolon.codex.page.monsters.wraith")
+                    .entityPage(EidolonEntities.WRAITH.get())
+                    .titlePage("eidolon.codex.page.monsters.chilled")
+                    .textPage("")
+                    .entityPage(EidolonEntities.GIANT_SKEL.get())
+                    .titlePage("eidolon.codex.page.monsters.giant_skeleton")
+                    .entityPage(EidolonEntities.NECROMANCER.get())
+                    .titlePage("eidolon.codex.page.monsters.necromancer")
+                    .build();
 
-            CRITTERS = new Chapter(
-                    "eidolon.codex.chapter.critters",
-                    new TitlePage("eidolon.codex.page.critters.raven"),
-                    new EntityPage(EidolonEntities.RAVEN.get()),
-                    new TitlePage("eidolon.codex.page.critters.slimy_slug"),
-                    new EntityPage(EidolonEntities.SLIMY_SLUG.get()),
-                    new TitledRitualPage("eidolon.codex.page.summon_ritual_c.1", prefix("summon_ravens")),
-                    new TitledRitualPage("eidolon.codex.page.summon_ritual_c.2", prefix("summon_slugs"))
-            );
+            CRITTERS = new CodexBuilder()
+                    .title("eidolon.codex.chapter.critters")
+                    .titlePage("eidolon.codex.page.critters.raven")
+                    .entityPage(EidolonEntities.RAVEN.get())
+                    .titlePage("eidolon.codex.page.critters.slimy_slug")
+                    .entityPage(EidolonEntities.SLIMY_SLUG.get())
+                    .titledRitualPage("eidolon.codex.page.summon_ritual_c.1", prefix("summon_ravens"))
+                    .titledRitualPage("eidolon.codex.page.summon_ritual_c.2", prefix("summon_slugs"))
+                    .build();
 
-            ORES = new Chapter(
-                    "eidolon.codex.chapter.ores",
-                    new TitlePage("eidolon.codex.page.ores.lead_ore"),
-                    new TitlePage("eidolon.codex.page.ores.silver_ore"),
-                    new SmeltingPage(new ItemStack(Registry.LEAD_INGOT.get()), new ItemStack(Registry.LEAD_ORE.get()), prefix("smelt_lead_ore")),
-                    new SmeltingPage(new ItemStack(Registry.SILVER_INGOT.get()), new ItemStack(Registry.SILVER_ORE.get()), prefix("smelt_silver_ore")),
-                    new CraftingPage(Registry.LEAD_BLOCK.get().asItem()),
-                    new CraftingPage(Registry.SILVER_BLOCK.get().asItem()),
-                    new CraftingPage(new ItemStack(Registry.LEAD_NUGGET.get(), 9), prefix("decompress_lead_ingot")),
-                    new CraftingPage(new ItemStack(Registry.SILVER_NUGGET.get(), 9), prefix("decompress_silver_ingot"))
-            );
+            ORES = new CodexBuilder()
+                    .title("eidolon.codex.chapter.ores")
+                    .titlePage("eidolon.codex.page.ores.lead_ore")
+                    .titlePage("eidolon.codex.page.ores.silver_ore")
+                    .smeltingPage(new ItemStack(Registry.LEAD_INGOT.get()), new ItemStack(Registry.LEAD_ORE.get()), prefix("smelt_lead_ore"))
+                    .smeltingPage(new ItemStack(Registry.SILVER_INGOT.get()), new ItemStack(Registry.SILVER_ORE.get()), prefix("smelt_silver_ore"))
+                    .craftingPage(Registry.LEAD_BLOCK.get())
+                    .craftingPage(new ItemStack(Registry.LEAD_NUGGET.get(), 9), prefix("decompress_lead_ingot"))
+                    .craftingPage(Registry.SILVER_BLOCK.get())
+                    .craftingPage(new ItemStack(Registry.SILVER_NUGGET.get(), 9), prefix("decompress_silver_ingot"))
+                    .build();
 
-            PEWTER = new Chapter(
-                    "eidolon.codex.chapter.pewter",
-                    new TitlePage("eidolon.codex.page.pewter"),
-                    new CraftingPage(new ItemStack(Registry.PEWTER_BLEND.get(), 2)),
-                    new SmeltingPage(new ItemStack(Registry.PEWTER_INGOT.get()), new ItemStack(Registry.PEWTER_BLEND.get()), prefix("smelt_pewter_blend")),
-                    new CraftingPage(Registry.PEWTER_BLOCK.get().asItem()),
-                    new CraftingPage(new ItemStack(Registry.PEWTER_NUGGET.get(), 9), prefix("decompress_pewter_ingot"))
-            );
+            PEWTER = new CodexBuilder()
+                    .title("eidolon.codex.chapter.pewter")
+                    .titlePage("eidolon.codex.page.pewter")
+                    .craftingPage(new ItemStack(Registry.PEWTER_BLEND.get(), 2))
+                    .smeltingPage(new ItemStack(Registry.PEWTER_INGOT.get()), new ItemStack(Registry.PEWTER_BLEND.get()), prefix("smelt_pewter_blend"))
+                    .craftingPage(Registry.PEWTER_BLOCK.get())
+                    .craftingPage(new ItemStack(Registry.PEWTER_NUGGET.get(), 9), prefix("decompress_pewter_ingot"))
+                    .build();
 
-            ENCHANTED_ASH = new Chapter(
-                    "eidolon.codex.chapter.enchanted_ash",
-                    new TitlePage("eidolon.codex.page.enchanted_ash"),
-                    new SmeltingPage(new ItemStack(Registry.ENCHANTED_ASH.get(), 2), new ItemStack(Items.BONE))
-            );
+            ENCHANTED_ASH = new CodexBuilder()
+                    .title("eidolon.codex.chapter.enchanted_ash")
+                    .titlePage("eidolon.codex.page.enchanted_ash")
+                    .smeltingPage(new ItemStack(Registry.ENCHANTED_ASH.get(), 2), new ItemStack(Items.BONE))
+                    .build();
 
-            PLANTS = new Chapter(
-                    "eidolon.codex.chapter.plants",
-                    new TitlePage("eidolon.codex.page.plants"),
-                    new TextPage("eidolon.codex.page.plants.1"),
-                    new WorktablePage(Registry.ATHAME.get()),
-                    new WorktablePage(Registry.PLANTER.get().asItem()),
-                    new CraftingPage(Registry.MERAMMER_RESIN.get())
-            );
+            PLANTS = new CodexBuilder()
+                    .title("eidolon.codex.chapter.plants")
+                    .titlePage("eidolon.codex.page.plants")
+                    .textPage("eidolon.codex.page.plants.1")
+                    .worktablePage(Registry.ATHAME.get())
+                    .worktablePage(Registry.PLANTER.get())
+                    .craftingPage(Registry.MERAMMER_RESIN.get())
+                    .build();
 
-            RESEARCHES = new Chapter(
-                    "eidolon.codex.chapter.researches",
-                    new TitlePage("eidolon.codex.page.researches.0"),
-                    new CraftingPage(Registry.RESEARCH_TABLE.get().asItem()),
-                    new CruciblePage(new ItemStack(Registry.MAGICIANS_WAX.get(), 4)),
-                    new CraftingPage(new ItemStack(Registry.ARCANE_SEAL.get(), 2)),
-                    new CruciblePage(new ItemStack(Registry.MAGIC_INK.get(), 2)),
-                    new CruciblePage(new ItemStack(Registry.PARCHMENT.get(), 4)),
-                    new CraftingPage(Registry.NOTETAKING_TOOLS.get())
-            );
+            RESEARCHES = new CodexBuilder()
+                    .title("eidolon.codex.chapter.researches")
+                    .textPage("eidolon.codex.page.researches.0")
+                    .craftingPage(Registry.RESEARCH_TABLE.get())
+                    .cruciblePage(new ItemStack(Registry.MAGICIANS_WAX.get(), 4))
+                    .craftingPage(new ItemStack(Registry.ARCANE_SEAL.get(), 2))
+                    .cruciblePage(new ItemStack(Registry.MAGIC_INK.get(), 2))
+                    .cruciblePage(new ItemStack(Registry.PARCHMENT.get(), 4))
+                    .craftingPage(Registry.NOTETAKING_TOOLS.get())
+                    .build();
 
-            DECORATIONS = new Chapter(
-                    "eidolon.codex.chapter.decorations",
-                    new TitlePage("eidolon.codex.page.decorations"),
-                    new CruciblePage(new ItemStack(Registry.ELDER_BRICK.get(), 16)),
-                    new CraftingPage(new ItemStack(Registry.ELDER_BRICKS.getBlock(), 4)),
-                    new CraftingPage(Registry.BONE_PILE.getBlock().asItem())
-            );
+            DECORATIONS = new CodexBuilder()
+                    .title("eidolon.codex.chapter.decorations")
+                    .titlePage("eidolon.codex.page.decorations")
+                    .cruciblePage(new ItemStack(Registry.ELDER_BRICK.get(), 16))
+                    .craftingPage(new ItemStack(Registry.ELDER_BRICKS.getBlock(), 4))
+                    .craftingPage(Registry.BONE_PILE.getBlock())
+                    .build();
 
             NATURE_INDEX = new Index(
                     "eidolon.codex.chapter.nature_index",
@@ -139,98 +164,98 @@ public class CodexChapters {
 
         //RITUALS
         {
-            BRAZIER = new Chapter(
-                    "eidolon.codex.chapter.brazier",
-                    new TitlePage("eidolon.codex.page.brazier.0"),
-                    new TextPage("eidolon.codex.page.brazier.1"),
-                    new CraftingPage(Registry.BRAZIER.get().asItem())
-            );
+            BRAZIER = new CodexBuilder()
+                    .title("eidolon.codex.chapter.brazier")
+                    .titlePage("eidolon.codex.page.brazier.0")
+                    .textPage("eidolon.codex.page.brazier.1")
+                    .craftingPage(Registry.BRAZIER.get().asItem())
+                    .build();
 
-            ITEM_PROVIDERS = new Chapter(
-                    "eidolon.codex.chapter.item_providers",
-                    new TitlePage("eidolon.codex.page.item_providers.0"),
-                    new CraftingPage(Registry.STONE_HAND.get().asItem()),
-                    new TitlePage("eidolon.codex.page.item_providers.1"),
-                    new CraftingPage(Registry.NECROTIC_FOCUS.get().asItem())
-            );
+            ITEM_PROVIDERS = new CodexBuilder()
+                    .title("eidolon.codex.chapter.item_providers")
+                    .titlePage("eidolon.codex.page.item_providers.0")
+                    .craftingPage(Registry.STONE_HAND.get().asItem())
+                    .titlePage("eidolon.codex.page.item_providers.1")
+                    .craftingPage(Registry.NECROTIC_FOCUS.get().asItem())
+                    .build();
 
-            CRYSTAL_RITUAL = new Chapter(
-                    "eidolon.codex.chapter.crystal_ritual",
-                    new TitledRitualPage("eidolon.codex.page.crystal_ritual", RitualRegistry.CRYSTAL_RITUAL),
-                    new TextPage("eidolon.codex.page.crystal_ritual")
-            );
+            CRYSTAL_RITUAL = new CodexBuilder()
+                    .title("eidolon.codex.chapter.crystal_ritual")
+                    .titledRitualPage("eidolon.codex.page.crystal_ritual", RitualRegistry.CRYSTAL_RITUAL)
+                    .textPage("eidolon.codex.page.crystal_ritual")
+                    .build();
 
-            SUMMON_RITUAL = new Chapter(
-                    "eidolon.codex.chapter.summon_ritual",
-                    new TitledRitualPage("eidolon.codex.page.summon_ritual.0", prefix("summon_zombie")),
-                    new TextPage("eidolon.codex.page.summon_ritual.0"),
-                    new TitledRitualPage("eidolon.codex.page.summon_ritual.1", prefix("summon_skeleton")),
-                    new TitledRitualPage("eidolon.codex.page.summon_ritual.2", prefix("summon_phantom")),
-                    new TitledRitualPage("eidolon.codex.page.summon_ritual.3", prefix("summon_wither_skeleton")),
-                    new TitledRitualPage("eidolon.codex.page.summon_ritual.4", prefix("summon_husk")),
-                    new TitledRitualPage("eidolon.codex.page.summon_ritual.5", prefix("summon_drowned")),
-                    new TitledRitualPage("eidolon.codex.page.summon_ritual.6", prefix("summon_stray")),
-                    new TitledRitualPage("eidolon.codex.page.summon_ritual.7", prefix("summon_wraith"))
-            );
+            SUMMON_RITUAL = new CodexBuilder()
+                    .title("eidolon.codex.chapter.summon_ritual")
+                    .titledRitualPage("eidolon.codex.page.summon_ritual.0", prefix("summon_zombie"))
+                    .textPage("eidolon.codex.page.summon_ritual.0")
+                    .titledRitualPage("eidolon.codex.page.summon_ritual.1", prefix("summon_skeleton"))
+                    .titledRitualPage("eidolon.codex.page.summon_ritual.2", prefix("summon_phantom"))
+                    .titledRitualPage("eidolon.codex.page.summon_ritual.3", prefix("summon_wither_skeleton"))
+                    .titledRitualPage("eidolon.codex.page.summon_ritual.4", prefix("summon_husk"))
+                    .titledRitualPage("eidolon.codex.page.summon_ritual.5", prefix("summon_drowned"))
+                    .titledRitualPage("eidolon.codex.page.summon_ritual.6", prefix("summon_stray"))
+                    .titledRitualPage("eidolon.codex.page.summon_ritual.7", prefix("summon_wraith"))
+                    .build();
 
-            ALLURE_RITUAL = new Chapter(
-                    "eidolon.codex.chapter.allure_ritual",
-                    new TitledRitualPage("eidolon.codex.page.allure_ritual", RitualRegistry.ALLURE_RITUAL),
-                    new TextPage("eidolon.codex.page.allure_ritual")
-            );
+            ALLURE_RITUAL = new CodexBuilder()
+                    .title("eidolon.codex.chapter.allure_ritual")
+                    .titledRitualPage("eidolon.codex.page.allure_ritual", RitualRegistry.ALLURE_RITUAL)
+                    .textPage("eidolon.codex.page.allure_ritual")
+                    .build();
 
-            REPELLING_RITUAL = new Chapter(
-                    "eidolon.codex.chapter.repelling_ritual",
-                    new TitledRitualPage("eidolon.codex.page.repelling_ritual", RitualRegistry.REPELLING_RITUAL),
-                    new TextPage("eidolon.codex.page.repelling_ritual")
-            );
+            REPELLING_RITUAL = new CodexBuilder()
+                    .title("eidolon.codex.chapter.repelling_ritual")
+                    .titledRitualPage("eidolon.codex.page.repelling_ritual", RitualRegistry.REPELLING_RITUAL)
+                    .textPage("eidolon.codex.page.repelling_ritual")
+                    .build();
 
-            DECEIT_RITUAL = new Chapter(
-                    "eidolon.codex.chapter.deceit_ritual",
-                    new TitledRitualPage("eidolon.codex.page.deceit_ritual", RitualRegistry.DECEIT_RITUAL),
-                    new TextPage("eidolon.codex.page.deceit_ritual")
-            );
+            DECEIT_RITUAL = new CodexBuilder()
+                    .title("eidolon.codex.chapter.deceit_ritual")
+                    .titledRitualPage("eidolon.codex.page.deceit_ritual", RitualRegistry.DECEIT_RITUAL)
+                    .textPage("eidolon.codex.page.deceit_ritual")
+                    .build();
 
-            TIME_RITUALS = new Chapter(
-                    "eidolon.codex.chapter.time_rituals",
-                    new TitledRitualPage("eidolon.codex.page.time_rituals.0", RitualRegistry.DAYLIGHT_RITUAL),
-                    new TextPage("eidolon.codex.page.time_rituals.0"),
-                    new TitledRitualPage("eidolon.codex.page.time_rituals.1", RitualRegistry.MOONLIGHT_RITUAL),
-                    new TextPage("eidolon.codex.page.time_rituals.1")
-            );
+            TIME_RITUALS = new CodexBuilder()
+                    .title("eidolon.codex.chapter.time_rituals")
+                    .titledRitualPage("eidolon.codex.page.time_rituals.0", RitualRegistry.DAYLIGHT_RITUAL)
+                    .textPage("eidolon.codex.page.time_rituals.0")
+                    .titledRitualPage("eidolon.codex.page.time_rituals.1", RitualRegistry.MOONLIGHT_RITUAL)
+                    .textPage("eidolon.codex.page.time_rituals.1")
+                    .build();
 
-            PURIFY_RITUAL = new Chapter(
-                    "eidolon.codex.chapter.purify_ritual",
-                    new TitledRitualPage("eidolon.codex.page.purify_ritual", RitualRegistry.PURIFY_RITUAL),
-                    new TextPage("eidolon.codex.page.purify_ritual")
-            );
+            PURIFY_RITUAL = new CodexBuilder()
+                    .title("eidolon.codex.chapter.purify_ritual")
+                    .titledRitualPage("eidolon.codex.page.purify_ritual", RitualRegistry.PURIFY_RITUAL)
+                    .textPage("eidolon.codex.page.purify_ritual")
+                    .build();
 
-            SANGUINE_RITUAL = new Chapter(
-                    "eidolon.codex.chapter.sanguine_ritual",
-                    new TitledRitualPage("eidolon.codex.page.sanguine_ritual.0", Registry.SAPPING_SWORD.get().getDefaultInstance()),
-                    new TextPage("eidolon.codex.page.sanguine_ritual.0"),
-                    new TitledRitualPage("eidolon.codex.page.sanguine_ritual.1", Registry.SANGUINE_AMULET.get().getDefaultInstance()),
-                    new TextPage("eidolon.codex.page.sanguine_ritual.1")
-            );
+            SANGUINE_RITUAL = new CodexBuilder()
+                    .title("eidolon.codex.chapter.sanguine_ritual")
+                    .titledRitualPage("eidolon.codex.page.sanguine_ritual.0", Registry.SAPPING_SWORD.get().getDefaultInstance())
+                    .textPage("eidolon.codex.page.sanguine_ritual.0")
+                    .titledRitualPage("eidolon.codex.page.sanguine_ritual.1", Registry.SANGUINE_AMULET.get().getDefaultInstance())
+                    .textPage("eidolon.codex.page.sanguine_ritual.1")
+                    .build();
 
-            RECHARGE_RITUAL = new Chapter(
-                    "eidolon.codex.chapter.recharge_ritual",
-                    new TitledRitualPage("eidolon.codex.page.recharge_ritual.soulfire", RitualRegistry.RECHARGE_SOULFIRE_RITUAL),
-                    new TitledRitualPage("eidolon.codex.page.recharge_ritual.bonechill", RitualRegistry.RECHARGE_BONECHILL_RITUAL),
-                    new TextPage("eidolon.codex.page.recharge_ritual")
-            );
+            RECHARGE_RITUAL = new CodexBuilder()
+                    .title("eidolon.codex.chapter.recharge_ritual")
+                    .titledRitualPage("eidolon.codex.page.recharge_ritual.soulfire", RitualRegistry.RECHARGE_SOULFIRE_RITUAL)
+                    .titledRitualPage("eidolon.codex.page.recharge_ritual.bonechill", RitualRegistry.RECHARGE_BONECHILL_RITUAL)
+                    .textPage("eidolon.codex.page.recharge_ritual")
+                    .build();
 
-            CAPTURE_RITUAL = new Chapter(
-                    "eidolon.codex.chapter.capture_ritual",
-                    new TitledRitualPage("eidolon.codex.page.capture_ritual", RitualRegistry.ABSORB_RITUAL),
-                    new TextPage("eidolon.codex.page.capture_ritual")
-            );
+            CAPTURE_RITUAL = new CodexBuilder()
+                    .title("eidolon.codex.chapter.capture_ritual")
+                    .titledRitualPage("eidolon.codex.page.capture_ritual", RitualRegistry.ABSORB_RITUAL)
+                    .textPage("eidolon.codex.page.capture_ritual")
+                    .build();
 
-            LOCATE_RITUAL = new Chapter(
-                    "eidolon.codex.chapter.locate_ritual",
-                    new TitledRitualPage("eidolon.codex.page.locate_ritual", prefix("ritual_catacomb_locator")),
-                    new TextPage("eidolon.codex.page.locate_ritual")
-            );
+            LOCATE_RITUAL = new CodexBuilder()
+                    .title("eidolon.codex.chapter.locate_ritual")
+                    .titledRitualPage("eidolon.codex.page.locate_ritual", prefix("ritual_catacomb_locator"))
+                    .textPage("eidolon.codex.page.locate_ritual")
+                    .build();
 
             RITUALS_INDEX = new Index(
                     "eidolon.codex.chapter.rituals",
@@ -265,225 +290,228 @@ public class CodexChapters {
         //ARTIFICE
         {
 
-            WOODEN_STAND = new Chapter(
-                    "eidolon.codex.chapter.wooden_stand",
-                    new TitlePage("eidolon.codex.page.wooden_stand.0"),
-                    new CraftingPage(Registry.WOODEN_STAND.get().asItem()),
-                    new TitlePage("eidolon.codex.page.wooden_stand.1"),
-                    new CruciblePage(new ItemStack(Registry.FUNGUS_SPROUTS.get(), 2))
-            );
+            WOODEN_STAND = new CodexBuilder()
+                    .title("eidolon.codex.chapter.wooden_stand")
+                    .titlePage("eidolon.codex.page.wooden_stand.0")
+                    .craftingPage(Registry.WOODEN_STAND.get().asItem())
+                    .titlePage("eidolon.codex.page.wooden_stand.1")
+                    .cruciblePage(new ItemStack(Registry.FUNGUS_SPROUTS.get(), 2))
+                    .build();
 
-            TALLOW = new Chapter(
-                    "eidolon.codex.chapter.tallow",
-                    new TitlePage("eidolon.codex.page.tallow.0"),
-                    new SmeltingPage(new ItemStack(Registry.TALLOW.get()), new ItemStack(Items.ROTTEN_FLESH)),
-                    new TitlePage("eidolon.codex.page.tallow.1"),
-                    new CraftingPage(new ItemStack(Registry.CANDLE.get(), 4)),
-                    new CraftingPage(Registry.CANDLESTICK.get().asItem())
-            );
+            TALLOW = new CodexBuilder()
+                    .title("eidolon.codex.chapter.tallow")
+                    .titlePage("eidolon.codex.page.tallow.0")
+                    .smeltingPage(new ItemStack(Registry.TALLOW.get()), new ItemStack(Items.ROTTEN_FLESH))
+                    .titlePage("eidolon.codex.page.tallow.1")
+                    .craftingPage(new ItemStack(Registry.CANDLE.get(), 4))
+                    .craftingPage(Registry.CANDLESTICK.get().asItem())
+                    .build();
 
-            CRUCIBLE = new Chapter(
-                    "eidolon.codex.chapter.crucible",
-                    new TitlePage("eidolon.codex.page.crucible.0"),
-                    new TextPage("eidolon.codex.page.crucible.1"),
-                    new CraftingPage(Registry.CRUCIBLE.get().asItem())
-            );
+            CRUCIBLE = new CodexBuilder()
+                    .title("eidolon.codex.chapter.crucible")
+                    .titlePage("eidolon.codex.page.crucible.0")
+                    .textPage("eidolon.codex.page.crucible.1")
+                    .craftingPage(Registry.CRUCIBLE.get().asItem())
+                    .build();
 
-            ARCANE_GOLD = new Chapter(
-                    "eidolon.codex.chapter.arcane_gold",
-                    new TitlePage("eidolon.codex.page.arcane_gold"),
-                    new CruciblePage(new ItemStack(Registry.ARCANE_GOLD_INGOT.get(), 2), prefix("arcane_gold_ingot_alchemy")),
-                    new CraftingPage(new ItemStack(Registry.ARCANE_GOLD_BLOCK.get())),
-                    new CraftingPage(new ItemStack(Registry.ARCANE_GOLD_NUGGET.get(), 9), prefix("decompress_arcane_gold_ingot"))
-            );
+            ARCANE_GOLD = new CodexBuilder()
+                    .title("eidolon.codex.chapter.arcane_gold")
+                    .titlePage("eidolon.codex.page.arcane_gold")
+                    .cruciblePage(new ItemStack(Registry.ARCANE_GOLD_INGOT.get(), 2), prefix("arcane_gold_ingot_alchemy"))
+                    .craftingPage(new ItemStack(Registry.ARCANE_GOLD_BLOCK.get()))
+                    .craftingPage(new ItemStack(Registry.ARCANE_GOLD_NUGGET.get(), 9), prefix("decompress_arcane_gold_ingot"))
+                    .build();
 
-            REAGENTS = new Chapter(
-                    "eidolon.codex.chapter.reagents",
-                    new TitlePage("eidolon.codex.page.reagents.0"),
-                    new CruciblePage(new ItemStack(Registry.SULFUR.get(), 2)),
-                    new TitlePage("eidolon.codex.page.reagents.1"),
-                    new CruciblePage(new ItemStack(Registry.DEATH_ESSENCE.get(), 4)),
-                    new TitlePage("eidolon.codex.page.reagents.2"),
-                    new CruciblePage(new ItemStack(Registry.CRIMSON_ESSENCE.get(), 4), prefix("crimson_essence_fungus")),
-                    new CruciblePage(new ItemStack(Registry.CRIMSON_ESSENCE.get(), 2), prefix("crimson_essence_vines")),
-                    new CruciblePage(new ItemStack(Registry.CRIMSON_ESSENCE.get(), 2), prefix("crimson_essence_roots")),
-                    new TitlePage("eidolon.codex.page.reagents.3"),
-                    new CruciblePage(new ItemStack(Registry.ENDER_CALX.get(), 2))
-            );
+            REAGENTS = new CodexBuilder()
+                    .title("eidolon.codex.chapter.reagents")
+                    .titlePage("eidolon.codex.page.reagents.0")
+                    .cruciblePage(new ItemStack(Registry.SULFUR.get(), 2))
+                    .titlePage("eidolon.codex.page.reagents.1")
+                    .cruciblePage(new ItemStack(Registry.DEATH_ESSENCE.get(), 4))
+                    .titlePage("eidolon.codex.page.reagents.2")
+                    .cruciblePage(new ItemStack(Registry.CRIMSON_ESSENCE.get(), 4), prefix("crimson_essence_fungus"))
+                    .cruciblePage(new ItemStack(Registry.CRIMSON_ESSENCE.get(), 2), prefix("crimson_essence_vines"))
+                    .cruciblePage(new ItemStack(Registry.CRIMSON_ESSENCE.get(), 2), prefix("crimson_essence_roots"))
+                    .titlePage("eidolon.codex.page.reagents.3")
+                    .cruciblePage(new ItemStack(Registry.ENDER_CALX.get(), 2))
+                    .build();
 
-            SOUL_GEMS = new Chapter(
-                    "eidolon.codex.chapter.soul_gems",
-                    new TitlePage("eidolon.codex.page.soul_gems"),
-                    new CruciblePage(Registry.LESSER_SOUL_GEM.get())
-            );
+            SOUL_GEMS = new CodexBuilder()
+                    .title("eidolon.codex.chapter.soul_gems")
+                    .titlePage("eidolon.codex.page.soul_gems")
+                    .cruciblePage(Registry.LESSER_SOUL_GEM.get())
+                    .build();
 
-            SHADOW_GEM = new Chapter(
-                    "eidolon.codex.chapter.shadow_gem",
-                    new TitlePage("eidolon.codex.page.shadow_gem"),
-                    new CruciblePage(Registry.SHADOW_GEM.get())
-            );
+            SHADOW_GEM = new CodexBuilder()
+                    .title("eidolon.codex.chapter.shadow_gem")
+                    .titlePage("eidolon.codex.page.shadow_gem")
+                    .cruciblePage(Registry.SHADOW_GEM.get())
+                    .build();
 
-            WARPED_SPROUTS = new Chapter(
-                    "eidolon.codex.chapter.warped_sprouts",
-                    new TitlePage("eidolon.codex.page.warped_sprouts.0"),
-                    new CruciblePage(new ItemStack(Registry.WARPED_SPROUTS.get(), 2)),
-                    new TitlePage("eidolon.codex.page.warped_sprouts.1")
-            );
+            WARPED_SPROUTS = new CodexBuilder()
+                    .title("eidolon.codex.chapter.warped_sprouts")
+                    .titlePage("eidolon.codex.page.warped_sprouts.0")
+                    .cruciblePage(new ItemStack(Registry.WARPED_SPROUTS.get(), 2))
+                    .titlePage("eidolon.codex.page.warped_sprouts.1")
+                    .build();
 
-            BASIC_ALCHEMY = new Chapter(
-                    "eidolon.codex.chapter.basic_alchemy",
-                    new TitlePage("eidolon.codex.page.basic_alchemy.0"),
-                    new CruciblePage(new ItemStack(Items.LEATHER), prefix("flesh_to_leather")),
-                    new TitlePage("eidolon.codex.page.basic_alchemy.1"),
-                    new CruciblePage(new ItemStack(Items.ROTTEN_FLESH), prefix("meat_to_flesh")),
-                    new TitlePage("eidolon.codex.page.basic_alchemy.2"),
-                    new CruciblePage(new ItemStack(Items.GUNPOWDER, 4), prefix("gunpowder_alchemy")),
-                    new TitlePage("eidolon.codex.page.basic_alchemy.3"),
-                    new CruciblePage(new ItemStack(Items.GOLDEN_APPLE), prefix("gilding_apple")),
-                    new CruciblePage(new ItemStack(Items.GOLDEN_CARROT), prefix("gilding_carrot")),
-                    new CruciblePage(new ItemStack(Items.GLISTERING_MELON_SLICE), prefix("gilding_melon"))
-            );
+            BASIC_ALCHEMY = new CodexBuilder()
+                    .title("eidolon.codex.chapter.basic_alchemy")
+                    .titlePage("eidolon.codex.page.basic_alchemy.0")
+                    .cruciblePage(new ItemStack(Items.LEATHER), prefix("flesh_to_leather"))
+                    .titlePage("eidolon.codex.page.basic_alchemy.1")
+                    .cruciblePage(new ItemStack(Items.ROTTEN_FLESH), prefix("meat_to_flesh"))
+                    .titlePage("eidolon.codex.page.basic_alchemy.2")
+                    .cruciblePage(new ItemStack(Items.GUNPOWDER, 4), prefix("gunpowder_alchemy"))
+                    .titlePage("eidolon.codex.page.basic_alchemy.3")
+                    .cruciblePage(new ItemStack(Items.GOLDEN_APPLE), prefix("gilding_apple"))
+                    .cruciblePage(new ItemStack(Items.GOLDEN_CARROT), prefix("gilding_carrot"))
+                    .cruciblePage(new ItemStack(Items.GLISTERING_MELON_SLICE), prefix("gilding_melon"))
+                    .build();
 
-            INLAYS = new Chapter(
-                    "eidolon.codex.chapter.inlays",
-                    new TitlePage("eidolon.codex.page.inlays"),
-                    new CraftingPage(new ItemStack(Registry.PEWTER_INLAY.get(), 2)),
-                    new CraftingPage(new ItemStack(Registry.GOLD_INLAY.get(), 2))
-            );
+            INLAYS = new CodexBuilder()
+                    .title("eidolon.codex.chapter.inlays")
+                    .titlePage("eidolon.codex.page.inlays")
+                    .craftingPage(new ItemStack(Registry.PEWTER_INLAY.get(), 2))
+                    .craftingPage(new ItemStack(Registry.GOLD_INLAY.get(), 2))
+                    .build();
 
-            BASIC_BAUBLES = new Chapter(
-                    "eidolon.codex.chapter.basic_baubles",
-                    new TitlePage("eidolon.codex.page.basic_baubles"),
-                    new CraftingPage(Registry.BASIC_AMULET.get()),
-                    new CraftingPage(Registry.BASIC_RING.get()),
-                    new CraftingPage(Registry.BASIC_BELT.get())
-            );
+            BASIC_BAUBLES = new CodexBuilder()
+                    .title("eidolon.codex.chapter.basic_baubles")
+                    .titlePage("eidolon.codex.page.basic_baubles")
+                    .craftingPage(Registry.BASIC_AMULET.get())
+                    .craftingPage(Registry.BASIC_RING.get())
+                    .craftingPage(Registry.BASIC_BELT.get())
+                    .build();
 
-            MAGIC_WORKBENCH = new Chapter(
-                    "eidolon.codex.chapter.magic_workbench",
-                    new TitlePage("eidolon.codex.page.magic_workbench"),
-                    new CraftingPage(Registry.WORKTABLE.get().asItem())
-            );
+            MAGIC_WORKBENCH = new CodexBuilder()
+                    .title("eidolon.codex.chapter.magic_workbench")
+                    .titlePage("eidolon.codex.page.magic_workbench")
+                    .craftingPage(Registry.WORKTABLE.get().asItem())
+                    .build();
 
-            VOID_AMULET = new Chapter(
-                    "eidolon.codex.chapter.void_amulet",
-                    new TitlePage("eidolon.codex.page.void_amulet"),
-                    new WorktablePage(Registry.VOID_AMULET.get())
-            );
+            VOID_AMULET = new CodexBuilder()
+                    .title("eidolon.codex.chapter.void_amulet")
+                    .titlePage("eidolon.codex.page.void_amulet")
+                    .worktablePage(Registry.VOID_AMULET.get())
+                    .build();
 
-            WARDED_MAIL = new Chapter(
-                    "eidolon.codex.chapter.warded_mail",
-                    new TitlePage("eidolon.codex.page.warded_mail"),
-                    new WorktablePage(Registry.WARDED_MAIL.get())
-            );
+            WARDED_MAIL = new CodexBuilder()
+                    .title("eidolon.codex.chapter.warded_mail")
+                    .titlePage("eidolon.codex.page.warded_mail")
+                    .worktablePage(Registry.WARDED_MAIL.get())
+                    .build();
 
-            SOULFIRE_WAND = new Chapter(
-                    "eidolon.codex.chapter.soulfire_wand",
-                    new TitlePage("eidolon.codex.page.soulfire_wand"),
-                    new WorktablePage(Registry.SOULFIRE_WAND.get())
-            );
+            SOULFIRE_WAND = new CodexBuilder()
+                    .title("eidolon.codex.chapter.soulfire_wand")
+                    .titlePage("eidolon.codex.page.soulfire_wand")
+                    .worktablePage(Registry.SOULFIRE_WAND.get())
+                    .build();
 
-            BONECHILL_WAND = new Chapter(
-                    "eidolon.codex.chapter.bonechill_wand",
-                    new TitlePage("eidolon.codex.page.bonechill_wand"),
-                    new WorktablePage(Registry.BONECHILL_WAND.get())
-            );
+            BONECHILL_WAND = new CodexBuilder()
+                    .title("eidolon.codex.chapter.bonechill_wand")
+                    .titlePage("eidolon.codex.page.bonechill_wand")
+                    .worktablePage(Registry.BONECHILL_WAND.get())
+                    .build();
 
-            REAPER_SCYTHE = new Chapter(
-                    "eidolon.codex.chapter.reaper_scythe",
-                    new TitlePage("eidolon.codex.page.reaper_scythe"),
-                    new WorktablePage(Registry.REAPER_SCYTHE.get()),
-                    new TitlePage("eidolon.codex.page.death_scythe"),
-                    new WorktablePage(Registry.DEATHBRINGER_SCYTHE.get())
-            );
+            REAPER_SCYTHE = new CodexBuilder()
+                    .title("eidolon.codex.chapter.reaper_scythe")
+                    .titlePage("eidolon.codex.page.reaper_scythe")
+                    .worktablePage(Registry.REAPER_SCYTHE.get())
+                    .titlePage("eidolon.codex.page.death_scythe")
+                    .worktablePage(Registry.DEATHBRINGER_SCYTHE.get())
+                    .build();
 
-            CLEAVING_AXE = new Chapter(
-                    "eidolon.codex.chapter.cleaving_axe",
-                    new TitlePage("eidolon.codex.page.cleaving_axe"),
-                    new WorktablePage(Registry.CLEAVING_AXE.get())
-            );
+            CLEAVING_AXE = new CodexBuilder()
+                    .title("eidolon.codex.chapter.cleaving_axe")
+                    .titlePage("eidolon.codex.page.cleaving_axe")
+                    .worktablePage(Registry.CLEAVING_AXE.get())
+                    .build();
 
-            SOUL_ENCHANTER = new Chapter(
-                    "eidolon.codex.chapter.soul_enchanter",
-                    new TitlePage("eidolon.codex.page.soul_enchanter.0"),
-                    new TextPage("eidolon.codex.page.soul_enchanter.1"),
-                    new WorktablePage(Registry.SOUL_ENCHANTER.get().asItem())
-            );
+            SOUL_ENCHANTER = new CodexBuilder()
+                    .title("eidolon.codex.chapter.soul_enchanter")
+                    .titlePage("eidolon.codex.page.soul_enchanter.0")
+                    .textPage("eidolon.codex.page.soul_enchanter.1")
+                    .worktablePage(Registry.SOUL_ENCHANTER.get().asItem())
+                    .build();
 
-            REVERSAL_PICK = new Chapter(
-                    "eidolon.codex.chapter.reversal_pick",
-                    new TitlePage("eidolon.codex.page.reversal_pick"),
-                    new WorktablePage(Registry.REVERSAL_PICK.get())
-            );
+            REVERSAL_PICK = new CodexBuilder()
+                    .title("eidolon.codex.chapter.reversal_pick")
+                    .titlePage("eidolon.codex.page.reversal_pick")
+                    .worktablePage(Registry.REVERSAL_PICK.get())
+                    .build();
 
-            WARLOCK_ARMOR = new Chapter(
-                    "eidolon.codex.chapter.warlock_armor",
-                    new TitlePage("eidolon.codex.page.warlock_armor.0"),
-                    new WorktablePage(new ItemStack(Registry.WICKED_WEAVE.get(), 8)),
-                    new TitlePage("eidolon.codex.page.warlock_armor.1"),
-                    new WorktablePage(Registry.WARLOCK_HAT.get()),
-                    new TitlePage("eidolon.codex.page.warlock_armor.2"),
-                    new WorktablePage(Registry.WARLOCK_CLOAK.get()),
-                    new TitlePage("eidolon.codex.page.warlock_armor.3"),
-                    new WorktablePage(Registry.WARLOCK_BOOTS.get())
-            );
+            WARLOCK_ARMOR = new CodexBuilder()
+                    .title("eidolon.codex.chapter.warlock_armor")
+                    .titlePage("eidolon.codex.page.warlock_armor.0")
+                    .worktablePage(new ItemStack(Registry.WICKED_WEAVE.get(), 8))
+                    .titlePage("eidolon.codex.page.warlock_armor.1")
+                    .worktablePage(Registry.WARLOCK_HAT.get())
+                    .titlePage("eidolon.codex.page.warlock_armor.2")
+                    .worktablePage(Registry.WARLOCK_CLOAK.get())
+                    .titlePage("eidolon.codex.page.warlock_armor.3")
+                    .worktablePage(Registry.WARLOCK_BOOTS.get())
+                    .build();
 
-            GRAVITY_BELT = new Chapter(
-                    "eidolon.codex.chapter.gravity_belt",
-                    new TitlePage("eidolon.codex.page.gravity_belt"),
-                    new WorktablePage(Registry.GRAVITY_BELT.get())
-            );
+            GRAVITY_BELT = new CodexBuilder()
+                    .title("eidolon.codex.chapter.gravity_belt")
+                    .titlePage("eidolon.codex.page.gravity_belt")
+                    .worktablePage(Registry.GRAVITY_BELT.get())
+                    .build();
 
-            PRESTIGIOUS_PALM = new Chapter(
-                    "eidolon.codex.chapter.prestigious_palm",
-                    new TitlePage("eidolon.codex.page.prestigious_palm"),
-                    new WorktablePage(Registry.PRESTIGIOUS_PALM.get())
-            );
+            PRESTIGIOUS_PALM = new CodexBuilder()
+                    .title("eidolon.codex.chapter.prestigious_palm")
+                    .titlePage("eidolon.codex.page.prestigious_palm")
+                    .worktablePage(Registry.PRESTIGIOUS_PALM.get())
+                    .build();
 
-            MIND_SHIELDING_PLATE = new Chapter(
-                    "eidolon.codex.chapter.mind_shielding_plate",
-                    new TitlePage("eidolon.codex.page.mind_shielding_plate"),
-                    new WorktablePage(Registry.MIND_SHIELDING_PLATE.get())
-            );
+            MIND_SHIELDING_PLATE = new CodexBuilder()
+                    .title("eidolon.codex.chapter.mind_shielding_plate")
+                    .titlePage("eidolon.codex.page.mind_shielding_plate")
+                    .worktablePage(Registry.MIND_SHIELDING_PLATE.get())
+                    .build();
 
-            RESOLUTE_BELT = new Chapter(
-                    "eidolon.codex.chapter.resolute_belt",
-                    new TitlePage("eidolon.codex.page.resolute_belt"),
-                    new WorktablePage(Registry.RESOLUTE_BELT.get())
-            );
+            RESOLUTE_BELT = new CodexBuilder()
+                    .title("eidolon.codex.chapter.resolute_belt")
+                    .titlePage("eidolon.codex.page.resolute_belt")
+                    .worktablePage(Registry.RESOLUTE_BELT.get())
+                    .build();
 
-            GLASS_HAND = new Chapter(
-                    "eidolon.codex.chapter.glass_hand",
-                    new TitlePage("eidolon.codex.page.glass_hand"),
-                    new WorktablePage(Registry.GLASS_HAND.get())
-            );
+            GLASS_HAND = new CodexBuilder()
+                    .title("eidolon.codex.chapter.glass_hand")
+                    .titlePage("eidolon.codex.page.glass_hand")
+                    .worktablePage(Registry.GLASS_HAND.get())
+                    .build();
 
-            SOULBONE = new Chapter(
-                    "eidolon.codex.chapter.soulbone_amulet",
-                    new TitlePage("eidolon.codex.page.soulbone_amulet"),
-                    new WorktablePage(Registry.SOULBONE_AMULET.get()),
-                    new TitlePage("eidolon.codex.page.soulbone_amulet.1"),
-                    new TitlePage("eidolon.codex.page.bonelord_armor"),
-                    new TextPage("eidolon.codex.page.bonelord_armor.1"),
-                    new WorktablePage(Registry.BONELORD_HELM.get()),
-                    new WorktablePage(Registry.BONELORD_CHESTPLATE.get()),
-                    new WorktablePage(Registry.BONELORD_GREAVES.get())
-            );
+            SOULBONE = new CodexBuilder()
+                    .title("eidolon.codex.chapter.soulbone_amulet")
+                    .titlePage("eidolon.codex.page.soulbone_amulet")
+                    .worktablePage(Registry.SOULBONE_AMULET.get())
+                    .titlePage("eidolon.codex.page.soulbone_amulet.1")
+                    .titlePage("eidolon.codex.page.bonelord_armor")
+                    .textPage("eidolon.codex.page.bonelord_armor.1")
+                    .worktablePage(Registry.BONELORD_HELM.get())
+                    .worktablePage(Registry.BONELORD_CHESTPLATE.get())
+                    .worktablePage(Registry.BONELORD_GREAVES.get())
+                    .build();
 
-            RAVEN_CLOAK = new Chapter("eidolon.codex.chapter.raven_cloak",
-                    new TitlePage("eidolon.codex.page.raven_cloak"),
-                    new WorktablePage(Registry.RAVEN_CLOAK.get())
-            );
+            RAVEN_CLOAK = new CodexBuilder()
+                    .title("eidolon.codex.chapter.raven_cloak")
+                    .titlePage("eidolon.codex.page.raven_cloak")
+                    .worktablePage(Registry.RAVEN_CLOAK.get())
+                    .build();
 
-            NECROMANCER_STAFF = new Chapter("eidolon.codex.chapter.summoning_staff",
-                    new TitlePage("eidolon.codex.page.summoning_staff"),
-                    new TextPage("eidolon.codex.page.summoning_staff.1")
-            );
+            NECROMANCER_STAFF = new CodexBuilder()
+                    .title("eidolon.codex.chapter.summoning_staff")
+                    .titlePage("eidolon.codex.page.summoning_staff")
+                    .textPage("eidolon.codex.page.summoning_staff.1")
+                    .build();
 
-            ARROW_RING = new Chapter("eidolon.codex.chapter.angel_sight",
-                    new TitlePage("eidolon.codex.page.angel_sight"),
-                    new WorktablePage(Registry.ANGELS_SIGHT.get())
-            );
+            ARROW_RING = new CodexBuilder()
+                    .title("eidolon.codex.chapter.angel_sight")
+                    .titlePage("eidolon.codex.page.angel_sight")
+                    .worktablePage(Registry.ANGELS_SIGHT.get())
+                    .build();
 
 
             ARTIFICE_INDEX = new Index(
@@ -540,32 +568,31 @@ public class CodexChapters {
 
         //THEURGY
         {
-            INTRO_SIGNS = new Chapter(
-                    "eidolon.codex.chapter.intro_signs",
-                    new TitlePage("eidolon.codex.page.intro_signs.0"),
-                    new TextPage("eidolon.codex.page.intro_signs.1")
-            );
+            INTRO_SIGNS = new CodexBuilder()
+                    .title("eidolon.codex.chapter.intro_signs")
+                    .titlePage("eidolon.codex.page.intro_signs.0")
+                    .textPage("eidolon.codex.page.intro_signs.1")
+                    .build();
 
-            EFFIGY = new Chapter(
-                    "eidolon.codex.chapter.effigy",
-                    new TitlePage("eidolon.codex.page.effigy"),
-                    new CraftingPage(Registry.STRAW_EFFIGY.get().asItem())
-            );
+            EFFIGY = new CodexBuilder()
+                    .title("eidolon.codex.chapter.effigy")
+                    .titlePage("eidolon.codex.page.effigy")
+                    .craftingPage(Registry.STRAW_EFFIGY.get().asItem())
+                    .build();
 
-            ALTARS = new Chapter(
-                    "eidolon.codex.chapter.altars",
-                    new TitlePage("eidolon.codex.page.altars.0"),
-                    new TextPage("eidolon.codex.page.altars.1"),
-                    new CraftingPage(new ItemStack(Registry.WOODEN_ALTAR.get(), 3)),
-                    new TitlePage("eidolon.codex.page.stone_altar"),
-                    new WorktablePage(new ItemStack(Registry.STONE_ALTAR.get(), 3)
-                    )
-            );
+            ALTARS = new CodexBuilder()
+                    .title("eidolon.codex.chapter.altars")
+                    .titlePage("eidolon.codex.page.altars.0")
+                    .textPage("eidolon.codex.page.altars.1")
+                    .craftingPage(new ItemStack(Registry.WOODEN_ALTAR.get(), 3))
+                    .titlePage("eidolon.codex.page.stone_altar")
+                    .worktablePage(new ItemStack(Registry.STONE_ALTAR.get(), 3))
+                    .build();
 
-            ALTAR_LIGHTS = new Chapter(
-                    "eidolon.codex.chapter.altar_lights",
-                    new TitlePage("eidolon.codex.page.altar_lights.0"),
-                    new ListPage("eidolon.codex.page.altar_lights.1",
+            ALTAR_LIGHTS = new CodexBuilder()
+                    .title("eidolon.codex.chapter.altar_lights")
+                    .titlePage("eidolon.codex.page.altar_lights.0")
+                    .listPage("eidolon.codex.page.altar_lights.1",
                             new ListEntry("torch", new ItemStack(Items.TORCH), Blocks.TORCH),
                             new ListEntry("soultorch", new ItemStack(Items.SOUL_TORCH), Blocks.SOUL_TORCH),
                             new ListEntry("lantern", new ItemStack(Items.LANTERN), Blocks.LANTERN),
@@ -574,105 +601,109 @@ public class CodexChapters {
                             new ListEntry("magic_candle", new ItemStack(Registry.MAGIC_CANDLE.get())),
                             new ListEntry("magic_candlestick", new ItemStack(Registry.MAGIC_CANDLESTICK.get()))
                     )
-            );
+                    .build();
 
-            ALTAR_SKULLS = new Chapter(
-                    "eidolon.codex.chapter.altar_skulls",
-                    new TitlePage("eidolon.codex.page.altar_skulls.0"),
-                    new ListPage("eidolon.codex.page.altar_skulls.1",
+            ALTAR_SKULLS = new CodexBuilder()
+                    .title("eidolon.codex.chapter.altar_skulls")
+                    .titlePage("eidolon.codex.page.altar_skulls.0")
+                    .listPage("eidolon.codex.page.altar_skulls.1",
                             new ListEntry("skull", new ItemStack(Items.SKELETON_SKULL)),
                             new ListEntry("zombie", new ItemStack(Items.ZOMBIE_HEAD)),
-                            new ListEntry("wither_skull", new ItemStack(Items.WITHER_SKELETON_SKULL)))
-            );
+                            new ListEntry("wither_skull", new ItemStack(Items.WITHER_SKELETON_SKULL))
+                    )
+                    .build();
 
-            ALTAR_HERBS = new Chapter(
-                    "eidolon.codex.chapter.altar_herbs",
-                    new TitlePage("eidolon.codex.page.altar_herbs.0"),
-                    new ListPage("eidolon.codex.page.altar_herbs.1",
+            ALTAR_HERBS = new CodexBuilder()
+                    .title("eidolon.codex.chapter.altar_herbs")
+                    .titlePage("eidolon.codex.page.altar_herbs.0")
+                    .listPage("eidolon.codex.page.altar_herbs.1",
                             new ListEntry("crimson_fungus", new ItemStack(Items.CRIMSON_FUNGUS), Blocks.POTTED_CRIMSON_FUNGUS),
                             new ListEntry("warped_fungus", new ItemStack(Items.WARPED_FUNGUS), Blocks.POTTED_WARPED_FUNGUS),
-                            new ListEntry("wither_rose", new ItemStack(Items.WITHER_ROSE), Blocks.POTTED_WITHER_ROSE))
-            );
+                            new ListEntry("wither_rose", new ItemStack(Items.WITHER_ROSE), Blocks.POTTED_WITHER_ROSE)
+                    )
+                    .build();
 
-            GOBLET = new Chapter(
-                    "eidolon.codex.chapter.goblet",
-                    new TitlePage("eidolon.codex.page.goblet"),
-                    new CraftingPage(Registry.GOBLET.get().asItem())
-            );
-            CENSER = new Chapter(
-                    "eidolon.codex.chapter.censer",
-                    new TitlePage("eidolon.codex.page.censer"),
-                    new CraftingPage(Registry.CENSER.get().asItem())
-            );
+            GOBLET = new CodexBuilder()
+                    .title("eidolon.codex.chapter.goblet")
+                    .titlePage("eidolon.codex.page.goblet")
+                    .craftingPage(Registry.GOBLET.get().asItem())
+                    .build();
 
-            DARK_PRAYER = new Chapter(
-                    "eidolon.codex.chapter.dark_prayer",
-                    new ChantPage("eidolon.codex.page.dark_prayer.0", Spells.DARK_PRAYER),
-                    new TextPage("eidolon.codex.page.dark_prayer.1")
-            );
-            LIGHT_PRAYER = new Chapter(
-                    "eidolon.codex.chapter.light_prayer",
-                    new ChantPage("eidolon.codex.page.light_prayer.0", Spells.LIGHT_PRAYER),
-                    new TextPage("eidolon.codex.page.light_prayer.1")
-            );
+            CENSER = new CodexBuilder()
+                    .title("eidolon.codex.chapter.censer")
+                    .titlePage("eidolon.codex.page.censer")
+                    .craftingPage(Registry.CENSER.get().asItem())
+                    .build();
 
+            DARK_PRAYER = new CodexBuilder()
+                    .title("eidolon.codex.chapter.dark_prayer")
+                    .chantPage("eidolon.codex.page.dark_prayer.0", Spells.DARK_PRAYER)
+                    .textPage("eidolon.codex.page.dark_prayer.1")
+                    .build();
 
-            ANIMAL_SACRIFICE = new Chapter(
-                    "eidolon.codex.chapter.animal_sacrifice",
-                    new ChantPage("eidolon.codex.page.animal_sacrifice", Spells.DARK_ANIMAL_SACRIFICE)
-            );
+            LIGHT_PRAYER = new CodexBuilder()
+                    .title("eidolon.codex.chapter.light_prayer")
+                    .chantPage("eidolon.codex.page.light_prayer.0", Spells.LIGHT_PRAYER)
+                    .textPage("eidolon.codex.page.light_prayer.1")
+                    .build();
 
-            INCENSE_BURN = new Chapter(
-                    "eidolon.codex.chapter.censer_offering",
-                    new TitlePage("eidolon.codex.page.censer_offering"),
-                    new CruciblePage(new ItemStack(Registry.OFFERING_INCENSE.get(), 2))
-            );
+            ANIMAL_SACRIFICE = new CodexBuilder()
+                    .title("eidolon.codex.chapter.animal_sacrifice")
+                    .chantPage("eidolon.codex.page.animal_sacrifice", Spells.DARK_ANIMAL_SACRIFICE)
+                    .build();
 
-            DARK_TOUCH = new Chapter(
-                    "eidolon.codex.chapter.dark_touch",
-                    new ChantPage("eidolon.codex.page.dark_touch.0", Spells.DARK_TOUCH),
-                    new TextPage("eidolon.codex.page.dark_touch.1")
-            );
+            INCENSE_BURN = new CodexBuilder()
+                    .title("eidolon.codex.chapter.censer_offering")
+                    .titlePage("eidolon.codex.page.censer_offering")
+                    .cruciblePage(new ItemStack(Registry.OFFERING_INCENSE.get(), 2))
+                    .build();
 
-            HOLY_TOUCH = new Chapter(
-                    "eidolon.codex.chapter.holy_touch",
-                    new ChantPage("eidolon.codex.page.holy_touch.0", Spells.HOLY_TOUCH),
-                    new TextPage("eidolon.codex.page.holy_touch.1")
-            );
+            DARK_TOUCH = new CodexBuilder()
+                    .title("eidolon.codex.chapter.dark_touch")
+                    .chantPage("eidolon.codex.page.dark_touch.0", Spells.DARK_TOUCH)
+                    .textPage("eidolon.codex.page.dark_touch.1")
+                    .build();
 
-            UNHOLY_EFFIGY = new Chapter(
-                    "eidolon.codex.chapter.unholy_effigy",
-                    new TitlePage("eidolon.codex.page.unholy_effigy"),
-                    new WorktablePage(Registry.ELDER_EFFIGY.get().asItem())
-            );
+            HOLY_TOUCH = new CodexBuilder()
+                    .title("eidolon.codex.chapter.holy_touch")
+                    .chantPage("eidolon.codex.page.holy_touch.0", Spells.HOLY_TOUCH)
+                    .textPage("eidolon.codex.page.holy_touch.1")
+                    .build();
 
-            HOLY_EFFIGY = new Chapter(
-                    "eidolon.codex.chapter.holy_effigy",
-                    new TitlePage("eidolon.codex.page.holy_effigy"),
-                    new WorktablePage(Registry.ELDER_EFFIGY.get().asItem())
-            );
+            UNHOLY_EFFIGY = new CodexBuilder()
+                    .title("eidolon.codex.chapter.unholy_effigy")
+                    .titlePage("eidolon.codex.page.unholy_effigy")
+                    .worktablePage(Registry.ELDER_EFFIGY.get().asItem())
+                    .build();
 
-            VILLAGER_SACRIFICE = new Chapter(
-                    "eidolon.codex.chapter.villager_sacrifice",
-                    new ChantPage("eidolon.codex.page.villager_sacrifice", Spells.DARK_VILLAGER_SACRIFICE)
-            );
+            HOLY_EFFIGY = new CodexBuilder()
+                    .title("eidolon.codex.chapter.holy_effigy")
+                    .titlePage("eidolon.codex.page.holy_effigy")
+                    .worktablePage(Registry.ELDER_EFFIGY.get().asItem())
+                    .build();
 
-            HEAL = new Chapter(
-                    "eidolon.codex.chapter.lay_on_hands",
-                    new ChantPage("eidolon.codex.page.lay_on_hands", Spells.LAY_ON_HANDS)
-            );
+            VILLAGER_SACRIFICE = new CodexBuilder()
+                    .title("eidolon.codex.chapter.villager_sacrifice")
+                    .chantPage("eidolon.codex.page.villager_sacrifice", Spells.DARK_VILLAGER_SACRIFICE)
+                    .build();
 
-            ZOMBIFY = new Chapter(
-                    "eidolon.codex.chapter.villager_zombie",
-                    new ChantPage("eidolon.codex.page.villager_zombie", Spells.ZOMBIFY),
-                    new TextPage("eidolon.codex.page.villager_zombie.1")
-            );
+            HEAL = new CodexBuilder()
+                    .title("eidolon.codex.chapter.lay_on_hands")
+                    .chantPage("eidolon.codex.page.lay_on_hands", Spells.LAY_ON_HANDS)
+                    .build();
 
-            CURE_ZOMBIE = new Chapter(
-                    "eidolon.codex.chapter.villager_cure",
-                    new ChantPage("eidolon.codex.page.villager_cure", Spells.CURE_ZOMBIE_CHANT),
-                    new TextPage("eidolon.codex.page.villager_cure.1")
-            );
+            ZOMBIFY = new CodexBuilder()
+                    .title("eidolon.codex.chapter.villager_zombie")
+                    .chantPage("eidolon.codex.page.villager_zombie", Spells.ZOMBIFY)
+                    .textPage("eidolon.codex.page.villager_zombie.1")
+                    .build();
+
+            CURE_ZOMBIE = new CodexBuilder()
+                    .title("eidolon.codex.chapter.villager_cure")
+                    .chantPage("eidolon.codex.page.villager_cure", Spells.CURE_ZOMBIE_CHANT)
+                    .textPage("eidolon.codex.page.villager_cure.1")
+                    .build();
+
 
             THEURGY_INDEX = new Index(
                     "eidolon.codex.chapter.theurgy",
@@ -718,71 +749,71 @@ public class CodexChapters {
 
         //SIGNS
         {
-            WICKED_SIGN = new Chapter(
-                    "eidolon.codex.chapter.wicked_sign",
-                    new TitlePage("eidolon.codex.page.wicked_sign"),
-                    new SignPage(Signs.WICKED_SIGN)
-            );
+            WICKED_SIGN = new CodexBuilder()
+                    .title("eidolon.codex.chapter.wicked_sign")
+                    .titlePage("eidolon.codex.page.wicked_sign")
+                    .signPage(Signs.WICKED_SIGN)
+                    .build();
 
-            SACRED_SIGN = new Chapter(
-                    "eidolon.codex.chapter.sacred_sign",
-                    new TitlePage("eidolon.codex.page.sacred_sign"),
-                    new SignPage(Signs.SACRED_SIGN)
-            );
+            SACRED_SIGN = new CodexBuilder()
+                    .title("eidolon.codex.chapter.sacred_sign")
+                    .titlePage("eidolon.codex.page.sacred_sign")
+                    .signPage(Signs.SACRED_SIGN)
+                    .build();
 
-            BLOOD_SIGN = new Chapter(
-                    "eidolon.codex.chapter.blood_sign",
-                    new TitlePage("eidolon.codex.page.blood_sign"),
-                    new SignPage(Signs.BLOOD_SIGN)
-            );
+            BLOOD_SIGN = new CodexBuilder()
+                    .title("eidolon.codex.chapter.blood_sign")
+                    .titlePage("eidolon.codex.page.blood_sign")
+                    .signPage(Signs.BLOOD_SIGN)
+                    .build();
 
-            SOUL_SIGN = new Chapter(
-                    "eidolon.codex.chapter.soul_sign",
-                    new TitlePage("eidolon.codex.page.soul_sign"),
-                    new SignPage(Signs.SOUL_SIGN)
-            );
+            SOUL_SIGN = new CodexBuilder()
+                    .title("eidolon.codex.chapter.soul_sign")
+                    .titlePage("eidolon.codex.page.soul_sign")
+                    .signPage(Signs.SOUL_SIGN)
+                    .build();
 
-            MIND_SIGN = new Chapter(
-                    "eidolon.codex.chapter.mind_sign",
-                    new TitlePage("eidolon.codex.page.mind_sign"),
-                    new SignPage(Signs.MIND_SIGN)
-            );
+            MIND_SIGN = new CodexBuilder()
+                    .title("eidolon.codex.chapter.mind_sign")
+                    .titlePage("eidolon.codex.page.mind_sign")
+                    .signPage(Signs.MIND_SIGN)
+                    .build();
 
-            FLAME_SIGN = new Chapter(
-                    "eidolon.codex.chapter.flame_sign",
-                    new TitlePage("eidolon.codex.page.flame_sign"),
-                    new SignPage(Signs.FLAME_SIGN)
-            );
+            FLAME_SIGN = new CodexBuilder()
+                    .title("eidolon.codex.chapter.flame_sign")
+                    .titlePage("eidolon.codex.page.flame_sign")
+                    .signPage(Signs.FLAME_SIGN)
+                    .build();
 
-            WINTER_SIGN = new Chapter(
-                    "eidolon.codex.chapter.winter_sign",
-                    new TitlePage("eidolon.codex.page.winter_sign"),
-                    new SignPage(Signs.WINTER_SIGN)
-            );
+            WINTER_SIGN = new CodexBuilder()
+                    .title("eidolon.codex.chapter.winter_sign")
+                    .titlePage("eidolon.codex.page.winter_sign")
+                    .signPage(Signs.WINTER_SIGN)
+                    .build();
 
-            HARMONY_SIGN = new Chapter(
-                    "eidolon.codex.chapter.harmony_sign",
-                    new TitlePage("eidolon.codex.page.harmony_sign"),
-                    new SignPage(Signs.HARMONY_SIGN)
-            );
+            HARMONY_SIGN = new CodexBuilder()
+                    .title("eidolon.codex.chapter.harmony_sign")
+                    .titlePage("eidolon.codex.page.harmony_sign")
+                    .signPage(Signs.HARMONY_SIGN)
+                    .build();
 
-            DEATH_SIGN = new Chapter(
-                    "eidolon.codex.chapter.death_sign",
-                    new TitlePage("eidolon.codex.page.death_sign"),
-                    new SignPage(Signs.DEATH_SIGN)
-            );
+            DEATH_SIGN = new CodexBuilder()
+                    .title("eidolon.codex.chapter.death_sign")
+                    .titlePage("eidolon.codex.page.death_sign")
+                    .signPage(Signs.DEATH_SIGN)
+                    .build();
 
-            WARDING_SIGN = new Chapter(
-                    "eidolon.codex.chapter.warding_sign",
-                    new TitlePage("eidolon.codex.page.warding_sign"),
-                    new SignPage(Signs.WARDING_SIGN)
-            );
+            WARDING_SIGN = new CodexBuilder()
+                    .title("eidolon.codex.chapter.warding_sign")
+                    .titlePage("eidolon.codex.page.warding_sign")
+                    .signPage(Signs.WARDING_SIGN)
+                    .build();
 
-            MAGIC_SIGN = new Chapter(
-                    "eidolon.codex.chapter.magic_sign",
-                    new TitlePage("eidolon.codex.page.magic_sign"),
-                    new SignPage(Signs.MAGIC_SIGN)
-            );
+            MAGIC_SIGN = new CodexBuilder()
+                    .title("eidolon.codex.chapter.magic_sign")
+                    .titlePage("eidolon.codex.page.magic_sign")
+                    .signPage(Signs.MAGIC_SIGN)
+                    .build();
 
             SIGNS_INDEX = new Index(
                     "eidolon.codex.chapter.signs_index",
@@ -813,52 +844,53 @@ public class CodexChapters {
 
         //SPELLS
         {
-            MANA = new Chapter("eidolon.codex.chapter.mana",
-                    new TitlePage("eidolon.codex.page.mana"),
-                    new TextPage("eidolon.codex.page.mana.1")
-            );
+            MANA = new CodexBuilder()
+                    .title("eidolon.codex.chapter.mana")
+                    .titlePage("eidolon.codex.page.mana")
+                    .textPage("eidolon.codex.page.mana.1")
+                    .build();
 
-            LIGHT = new Chapter(
-                    "eidolon.codex.chapter.light",
-                    new ChantPage("eidolon.codex.page.light", Spells.LIGHT_CHANT)
-            );
+            LIGHT = new CodexBuilder()
+                    .title("eidolon.codex.chapter.light")
+                    .chantPage("eidolon.codex.page.light", Spells.LIGHT_CHANT)
+                    .build();
 
-            FIRE_TOUCH = new Chapter(
-                    "eidolon.codex.chapter.fire_touch",
-                    new ChantPage("eidolon.codex.page.fire_touch", Spells.FIRE_CHANT)
-            );
+            FIRE_TOUCH = new CodexBuilder()
+                    .title("eidolon.codex.chapter.fire_touch")
+                    .chantPage("eidolon.codex.page.fire_touch", Spells.FIRE_CHANT)
+                    .build();
 
-            CHILL_TOUCH = new Chapter(
-                    "eidolon.codex.chapter.chill_touch",
-                    new ChantPage("eidolon.codex.page.chill_touch", Spells.FROST_CHANT)
-            );
+            CHILL_TOUCH = new CodexBuilder()
+                    .title("eidolon.codex.chapter.chill_touch")
+                    .chantPage("eidolon.codex.page.chill_touch", Spells.FROST_CHANT)
+                    .build();
 
-            WATER = new Chapter(
-                    "eidolon.codex.chapter.water",
-                    new ChantPage("eidolon.codex.page.water", Spells.WATER_CHANT),
-                    new TextPage("eidolon.codex.page.water.1")
-            );
+            WATER = new CodexBuilder()
+                    .title("eidolon.codex.chapter.water")
+                    .chantPage("eidolon.codex.page.water", Spells.WATER_CHANT)
+                    .textPage("eidolon.codex.page.water.1")
+                    .build();
 
-            ENTHRALL = new Chapter(
-                    "eidolon.codex.chapter.enthrall",
-                    new ChantPage("eidolon.codex.page.enthrall", Spells.ENTHRALL_UNDEAD),
-                    new TextPage("eidolon.codex.page.enthrall.1")
-            );
+            ENTHRALL = new CodexBuilder()
+                    .title("eidolon.codex.chapter.enthrall")
+                    .chantPage("eidolon.codex.page.enthrall", Spells.ENTHRALL_UNDEAD)
+                    .textPage("eidolon.codex.page.enthrall.1")
+                    .build();
 
-            SMITE = new Chapter(
-                    "eidolon.codex.chapter.smite",
-                    new ChantPage("eidolon.codex.page.smite", Spells.SMITE_CHANT)
-            );
+            SMITE = new CodexBuilder()
+                    .title("eidolon.codex.chapter.smite")
+                    .chantPage("eidolon.codex.page.smite", Spells.SMITE_CHANT)
+                    .build();
 
-            SUNDER_ARMOR = new Chapter(
-                    "eidolon.codex.chapter.sunder_armor",
-                    new ChantPage("eidolon.codex.page.sunder_armor", Spells.SUNDER_ARMOR)
-            );
+            SUNDER_ARMOR = new CodexBuilder()
+                    .title("eidolon.codex.chapter.sunder_armor")
+                    .chantPage("eidolon.codex.page.sunder_armor", Spells.SUNDER_ARMOR)
+                    .build();
 
-            REINFORCE_ARMOR = new Chapter(
-                    "eidolon.codex.chapter.reinforce_armor",
-                    new ChantPage("eidolon.codex.page.reinforce_armor", Spells.BLESS_ARMOR)
-            );
+            REINFORCE_ARMOR = new CodexBuilder()
+                    .title("eidolon.codex.chapter.reinforce_armor")
+                    .chantPage("eidolon.codex.page.reinforce_armor", Spells.BLESS_ARMOR)
+                    .build();
 
             SPELLS_INDEX = new Index(
                     "eidolon.codex.chapter.spells",
@@ -884,5 +916,121 @@ public class CodexChapters {
                     SPELLS_INDEX
             ));
         }
+    }
+
+    private static float lexiconLookupTime = 0;
+    private static int oldMouseX = -1;
+    private static int oldMouseY = -1;
+
+    public static void onTooltip(GuiGraphics graphics, ItemStack stack, int mouseX, int mouseY) {
+        PoseStack ms = graphics.pose();
+        Minecraft mc = Minecraft.getInstance();
+        int tooltipX = mouseX;
+        int tooltipY = mouseY - 4;
+        if (mc.player == null) {
+            return;
+        }
+
+        var docEntry = itemToEntryMap.get(stack.getItem());
+
+        if (docEntry == null || docEntry.chapter == null || !docEntry.isUnlocked()) {
+            return;
+        }
+        boolean hasSpellBook = false;
+        for (int i = 0; i < Inventory.getSelectionSize(); i++) {
+            ItemStack stackAt = mc.player.getInventory().getItem(i);
+            if (!stackAt.isEmpty()) {
+                if (stackAt.getItem() instanceof CodexItem) {
+                    hasSpellBook = true;
+                }
+            }
+        }
+        if (!hasSpellBook) {
+            lexiconLookupTime = 0F;
+            return;
+        }
+        if (lexiconLookupTime > 0) {
+            if (oldMouseX != mouseX || oldMouseY != mouseY) {
+                lexiconLookupTime = 0F;
+            }
+        }
+
+        if (mc.screen instanceof CodexGui pageHolderScreen && pageHolderScreen.currentChapter == docEntry.chapter) {
+            return;
+        }
+
+        int x = tooltipX - 34;
+        RenderSystem.disableDepthTest();
+
+        graphics.fill(x - 4, tooltipY - 4, x + 20, tooltipY + 26, 0x44000000);
+        graphics.fill(x - 6, tooltipY - 6, x + 22, tooltipY + 28, 0x44000000);
+
+        boolean boundToControl = EidolonKeybindings.OPEN_BOOK.getKey().getValue() == 341;
+        if (boundToControl ? Screen.hasControlDown() :
+                InputConstants.isKeyDown(Minecraft.getInstance().getWindow().getWindow(), EidolonKeybindings.OPEN_BOOK.getKey().getValue())) {
+            lexiconLookupTime += ClientInfo.deltaTicks;
+            oldMouseX = mouseX;
+            oldMouseY = mouseY;
+
+            int cx = x + 8;
+            int cy = tooltipY + 8;
+            float r = 12;
+            float time = 20F;
+            float angles = lexiconLookupTime / time * 360F;
+            float a = 0.5F + 0.2F * ((float) Math.cos(ClientInfo.totalTicks / 10.0) * 0.5F + 0.5F);
+
+            RenderSystem.enableBlend();
+            RenderSystem.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+
+            Tesselator tesselator = Tesselator.getInstance();
+            BufferBuilder buf = tesselator.getBuilder();
+
+            buf.begin(VertexFormat.Mode.TRIANGLE_FAN, DefaultVertexFormat.POSITION_COLOR);
+
+            buf.vertex(cx, cy, 0).color(0.5F, 0.0F, 0.6F, a).endVertex();
+
+            for (float i = angles; i > 0; i--) {
+                double rad = Math.toRadians(i - 90);
+                buf.vertex((float) (cx + Math.cos(rad) * r), (float) (cy + Math.sin(rad) * r), 0).color(0.75F, 0F, 1.0F, 1F).endVertex();
+            }
+
+            buf.vertex(cx, cy, 0).color(.75F, 0F, 1.0F, 0F).endVertex();
+
+            tesselator.end();
+            RenderSystem.disableBlend();
+
+            if (lexiconLookupTime >= time) {
+                CodexGui.openToEntry(docEntry.chapter, 0);
+                lexiconLookupTime = 0F;
+            }
+        } else {
+            lexiconLookupTime = 0f;
+        }
+
+        ms.pushPose();
+        ms.translate(0, 0, 300);
+
+        RenderSystem.enableDepthTest();
+
+        Minecraft minecraft = Minecraft.getInstance();
+        Font font = minecraft.font;
+        graphics.renderFakeItem(stack, x, tooltipY);
+        graphics.renderItemDecorations(font, stack, x, tooltipY);
+        RenderSystem.disableBlend();
+
+        ms.popPose();
+
+        ms.pushPose();
+        ms.translate(0, 0, 500);
+        graphics.drawString(mc.font, "?", x + 10, tooltipY + 8, 0xFFFFFFFF);
+
+        ms.scale(0.5F, 0.5F, 1F);
+        boolean mac = Minecraft.ON_OSX;
+        Component key = (boundToControl ? (mac ? Component.literal("Cmd") : Component.literal("Ctrl")) : EidolonKeybindings.OPEN_BOOK.getTranslatedKeyMessage().copy())
+                .withStyle(ChatFormatting.BOLD);
+        graphics.drawString(mc.font, key, (x + 10) * 2 - 16, (tooltipY + 8) * 2 + 20, 0xFFFFFFFF);
+        ms.popPose();
+
+        RenderSystem.enableDepthTest();
     }
 }
