@@ -132,16 +132,23 @@ public class SummoningStaffItem extends ItemBase {
         } else {
             ListTag existing = tag.getList("charges", Tag.TAG_COMPOUND);
             while (existing.size() + charges.size() > 100) charges.remove(charges.size() - 1);
-            if (charges.size() > 0) existing.addAll(charges);
+            if (!charges.isEmpty()) existing.addAll(charges);
             tag.put("charges", existing);
         }
+        return stack;
+    }
+
+    public ItemStack addCharge(ItemStack stack, CompoundTag tag) {
+        ListTag list = getCharges(stack);
+        if (list.size() < 100) list.add(tag);
+        stack.getOrCreateTag().put("charges", list);
         return stack;
     }
 
     public boolean hasCharges(ItemStack stack) {
         CompoundTag tag = stack.getOrCreateTag();
         ListTag list = tag.getList("charges", Tag.TAG_COMPOUND);
-        return tag.contains("charges") && list.size() > 0;
+        return tag.contains("charges") && !list.isEmpty();
     }
 
     public ListTag getCharges(ItemStack stack) {
@@ -156,21 +163,14 @@ public class SummoningStaffItem extends ItemBase {
         return stack;
     }
 
-    public ItemStack addCharge(ItemStack stack, CompoundTag tag) {
-        ListTag list = getCharges(stack);
-        if (list.size() < 100) list.add(tag);
-        stack.getOrCreateTag().put("charges", list);
-        return stack;
-    }
-
     @Override
     public @NotNull InteractionResultHolder<ItemStack> use(@NotNull Level world, Player player, @NotNull InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
 
         if (hasCharges(stack)) {
-            if (player.isCrouching()) {
-                changeSelection(stack, 1);
-                CompoundTag tag = getCharges(stack).getCompound(getSelected(stack));
+            if (player.isShiftKeyDown()) {
+                int sel = changeSelection(stack, 1);
+                CompoundTag tag = getCharges(stack).getCompound(sel);
                 ResourceLocation id = new ResourceLocation(tag.getString("id"));
                 String summonKey = "entity." + id.getNamespace() + "." + id.getPath();
                 player.setItemInHand(hand, stack);
