@@ -1,7 +1,5 @@
 package elucent.eidolon.gui;
 
-import com.hollingsworth.arsnouveau.api.client.ITooltipProvider;
-import com.hollingsworth.arsnouveau.client.gui.GuiUtils;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -14,8 +12,6 @@ import elucent.eidolon.util.KnowledgeUtil;
 import elucent.eidolon.util.RenderUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.AbstractWidget;
-import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.network.chat.Component;
@@ -181,19 +177,12 @@ public class ScriptoriumScreen extends AbstractContainerScreen<ScriptoriumContai
         super.renderTooltip(stack, mouseX, mouseY);
     }
 
-    @Override
-    protected void renderLabels(@NotNull GuiGraphics pGuiGraphics, int pMouseX, int pMouseY) {
+    private void collectTooltips(int mouseX, int mouseY, List<Component> tooltip) {
 
     }
 
-    public void collectTooltips(int mouseX, int mouseY, List<Component> tooltip) {
-        for (Renderable renderable : renderables) {
-            if (renderable instanceof AbstractWidget widget && renderable instanceof ITooltipProvider tooltipProvider) {
-                if (GuiUtils.isMouseInRelativeRange(mouseX, mouseY, widget)) {
-                    tooltipProvider.getTooltip(tooltip);
-                    break;
-                }
-            }
-        }
+    @Override
+    protected void renderLabels(@NotNull GuiGraphics pGuiGraphics, int pMouseX, int pMouseY) {
+
     }
 }
