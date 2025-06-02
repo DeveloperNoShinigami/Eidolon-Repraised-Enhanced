@@ -23,7 +23,7 @@ apply plugin: 'maven-publish'
 
 version = mod_version
 archivesBaseName = mod_id + "-" + mc_version
-
+group = 'com.alexthw.eidolon_repraised'
 
 if (System.getenv('BUILD_NUMBER') != null) {
     version += "." + System.getenv('BUILD_NUMBER')

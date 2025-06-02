@@ -149,6 +149,9 @@ public class CodexGui extends Screen {
 
     @Override
     public void render(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
+        if (currentChapter == null) {
+            currentChapter = CodexChapters.NATURE_INDEX;
+        }
         hasTooltip = false;
         this.minecraft = Minecraft.getInstance();
         renderBackground(guiGraphics);

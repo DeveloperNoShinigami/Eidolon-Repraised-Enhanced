@@ -30,6 +30,22 @@ Main changes related to this port :
 
 DO NOT REPORT BUGS OR QUESTIONS TO THE ORIGINAL DISCORD OF EIDOLON, I warned thee, Gabb will have all the rights to feast on your heart.
 
- **The mod won't be released until i can provide a decent support discord, and possibly wrap up some research/spell things in the meanwhile. If you download the builds, make sure to respect the phrase in caps and at max open an issue here on github.**
-
 Only requirements is Curios. No ports to older versions or modloaders will be done.
+
+Every push to this repository is built and published to the [BlameJared](https://maven.blamejared.com) maven, to use
+these builds in your project, simply add the following code in your build.gradle
+
+```gradle
+repositories {
+    maven { url 'https://maven.blamejared.com' }
+}
+
+dependencies {
+    implementation ("com.alexthw.eidolon_repraised:eidolon-[MC_VERSION]:[VERSION]") {transitive=false}
+}
+```
+
+Current version (1.20.1):
+[![Maven](https://img.shields.io/maven-metadata/v?label=&color=C71A36&metadataUrl=https%3A%2F%2Fmaven.blamejared.com%2Fcom%2Falexthw%2Feidolon_repraised%2Feidolon_repraised-1.20.1%2Fmaven-metadata.xml&style=flat-square)](https://maven.blamejared.com/com/alexthw/eidolon_repraised/eidolon_repraised-1.20.1/)
+
+(remove the v)
