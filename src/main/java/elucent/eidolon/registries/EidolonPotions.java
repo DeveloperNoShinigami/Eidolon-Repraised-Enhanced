@@ -52,14 +52,14 @@ public class EidolonPotions {
         PotionBrewingMixin.callAddMix(ANCHORED_POTION.get(), Items.REDSTONE, LONG_ANCHORED_POTION.get());
         PotionBrewingMixin.callAddMix(AWKWARD, Items.NAUTILUS_SHELL, REINFORCED_POTION.get());
         PotionBrewingMixin.callAddMix(REINFORCED_POTION.get(), Items.REDSTONE, LONG_REINFORCED_POTION.get());
-        PotionBrewingMixin.callAddMix(REINFORCED_POTION.get(), Items.GLOWSTONE, STRONG_REINFORCED_POTION.get());
+        PotionBrewingMixin.callAddMix(REINFORCED_POTION.get(), Items.GLOWSTONE_DUST, STRONG_REINFORCED_POTION.get());
         PotionBrewingMixin.callAddMix(AWKWARD, Registry.TATTERED_CLOTH.get(), VULNERABLE_POTION.get());
         PotionBrewingMixin.callAddMix(VULNERABLE_POTION.get(), Items.REDSTONE, LONG_VULNERABLE_POTION.get());
-        PotionBrewingMixin.callAddMix(VULNERABLE_POTION.get(), Items.GLOWSTONE, STRONG_VULNERABLE_POTION.get());
+        PotionBrewingMixin.callAddMix(VULNERABLE_POTION.get(), Items.GLOWSTONE_DUST, STRONG_VULNERABLE_POTION.get());
         PotionBrewingMixin.callAddMix(AWKWARD, Registry.DEATH_ESSENCE.get(), UNDEATH_POTION.get());
         PotionBrewingMixin.callAddMix(UNDEATH_POTION.get(), Items.REDSTONE, LONG_UNDEATH_POTION.get());
         PotionBrewingMixin.callAddMix(AWKWARD, Registry.WITHERED_HEART.get(), DECAY_POTION.get());
         PotionBrewingMixin.callAddMix(DECAY_POTION.get(), Items.REDSTONE, LONG_DECAY_POTION.get());
-        PotionBrewingMixin.callAddMix(DECAY_POTION.get(), Items.GLOWSTONE, STRONG_DECAY_POTION.get());
+        PotionBrewingMixin.callAddMix(DECAY_POTION.get(), Items.GLOWSTONE_DUST, STRONG_DECAY_POTION.get());
     }
 }
