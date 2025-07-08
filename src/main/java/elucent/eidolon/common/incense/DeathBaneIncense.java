@@ -1,6 +1,7 @@
 package elucent.eidolon.common.incense;
 
-import elucent.eidolon.api.ritual.IncenseRitual;
+import elucent.eidolon.client.particle.Particles;
+import elucent.eidolon.registries.EidolonParticles;
 import elucent.eidolon.registries.EidolonPotions;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
@@ -9,28 +10,41 @@ import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.MobType;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.phys.AABB;
 
-public class DeathBaneIncense extends IncenseRitual {
+public class DeathBaneIncense extends GenericPotionIncense {
+
     public DeathBaneIncense(ResourceLocation registryName) {
         super(800, registryName);
     }
 
+
     @Override
-    public void tickEffect(int age) {
-        // every 20 ticks, apply a wither effect to the living entities around the censer and heal the undead
-        if (age % 20 == 0) {
-            Level level = censer.getLevel();
-            BlockPos pos = censer.getBlockPos();
-            assert level != null;
-            for (LivingEntity entity : level.getEntitiesOfClass(LivingEntity.class, new AABB(pos).inflate(10))) {
-                if (entity.getMobType() != MobType.UNDEAD) {
-                    entity.addEffect(new MobEffectInstance(EidolonPotions.LIGHT_BLESSED.get(), 20 * 60 * 10));
-                } else {
-                    entity.addEffect(new MobEffectInstance(MobEffects.CONFUSION, 20 * 60 * 2));
-                }
-            }
-        }
+    public MobEffectInstance getEffect(Level level, BlockPos blockPos, LivingEntity livingEntity) {
+        return livingEntity.getMobType() != MobType.UNDEAD ?
+                new MobEffectInstance(EidolonPotions.LIGHT_BLESSED.get(), 20 * 60 * 10) :
+                new MobEffectInstance(MobEffects.CONFUSION, 20 * 60 * 2);
     }
 
+    @Override
+    public void animateParticles(int burnCounter, BlockPos blockPos, Level level) {
+        super.animateParticles(burnCounter, blockPos, level);
+        double x = blockPos.getX();
+        double y = blockPos.getY() + 1;
+        double z = blockPos.getZ();
+        if (level.random.nextInt(4) == 0) {
+            Particles.create(EidolonParticles.FLAME_PARTICLE)
+                    .setAlpha(0.5f, 0).setScale(0.175f, 0.125f).setLifetime(80)
+                    .randomOffset(range() * 0.75, 0.1).randomVelocity(0.025f, 0.025f)
+                    .addVelocity(0, -0.0125f, 0)
+                    .setColor(0.75F, 0.95F, 0.95F, 0.005f, 0.005f, 0.005f)
+                    .repeat(level, x, y - .75, z, 2);
+            Particles.createRune(ResourceLocation.tryParse("eidolon:purity"))
+                    .setAlpha(0.75f, 0).setScale(0.475f, 0.25f).setLifetime(160)
+                    .randomOffset(range() * 0.75, 0.25).randomVelocity(0.025f, 0.025f)
+                    .addVelocity(0, -0.0125f, 0)
+                    .setColor(0.95F, 0.95F, 0.95F, 0.005f, 0.005f, 0.005f)
+                    .repeat(level, x, y + .75, z, 2);
+        }
+
+    }
 }

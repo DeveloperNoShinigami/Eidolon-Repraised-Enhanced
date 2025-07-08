@@ -1,0 +1,37 @@
+{
+  "type": "eidolon:crucible",
+  "steps": [
+    {
+      "items": [
+        {
+          "item": "eidolon:withered_heart"
+        },
+        {
+          "item": "eidolon:avennian_sprig"
+        },
+        {
+          "item": "minecraft:bone_meal"
+        }
+      ]
+    },
+    {
+      "items": [
+        {
+          "item": "eidolon:death_essence"
+        }
+      ]
+    },
+    {
+      "stirs": 1,
+      "items": [
+        {
+          "item": "eidolon:merammer_resin"
+        }
+      ]
+    }
+  ],
+  "result": {
+    "item": "eidolon:frail_incense",
+    "count": 2
+  }
+}

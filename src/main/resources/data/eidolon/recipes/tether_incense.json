@@ -1,0 +1,37 @@
+{
+  "type": "eidolon:crucible",
+  "steps": [
+    {
+      "items": [
+        {
+          "item": "eidolon:ender_calx"
+        },
+        {
+          "item": "eidolon:avennian_sprig"
+        },
+        {
+          "item": "eidolon:soul_shard"
+        }
+      ]
+    },
+    {
+      "stirs": 1,
+      "items": [
+        {
+          "item": "eidolon:magicians_wax"
+        }
+      ]
+    },
+    {
+      "items": [
+        {
+          "item": "eidolon:merammer_resin"
+        }
+      ]
+    }
+  ],
+  "result": {
+    "item": "eidolon:tether_incense",
+    "count": 1
+  }
+}

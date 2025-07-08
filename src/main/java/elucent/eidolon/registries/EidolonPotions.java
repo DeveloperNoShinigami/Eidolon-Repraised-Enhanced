@@ -43,6 +43,7 @@ public class EidolonPotions {
     public static final RegistryObject<Potion> DECAY_POTION = POTION_TYPES.register("decay", () -> new Potion(new MobEffectInstance(MobEffects.WITHER, 900)));
     public static final RegistryObject<MobEffect> LIGHT_BLESSED = POTIONS.register("light_blessing", BlessedEffect::new);
 
+    public static final RegistryObject<MobEffect> SOUL_HARVEST = POTIONS.register("soul_harvest", SHarvestEffect::new);
 
     public static void addBrewingRecipes() {
         PotionBrewingMixin.callAddMix(WATER, Registry.FUNGUS_SPROUTS.get(), AWKWARD);

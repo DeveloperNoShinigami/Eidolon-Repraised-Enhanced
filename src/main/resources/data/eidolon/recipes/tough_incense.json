@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "eidolon:merammer_resin"
+    },
+    {
+      "item": "eidolon:avennian_sprig"
+    },
+    {
+      "item": "minecraft:iron_nugget"
+    },
+    {
+      "item": "eidolon:magicians_wax"
+    }
+  ],
+  "result": {
+    "item": "eidolon:tough_incense",
+    "count": 1
+  }
+}

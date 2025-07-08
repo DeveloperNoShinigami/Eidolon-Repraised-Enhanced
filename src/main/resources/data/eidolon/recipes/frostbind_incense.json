@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "eidolon:merammer_resin"
+    },
+    {
+      "item": "eidolon:wraith_heart"
+    },
+    {
+      "item": "minecraft:packed_ice"
+    },
+    {
+      "item": "minecraft:snowball"
+    }
+  ],
+  "result": {
+    "item": "eidolon:frostbind_incense",
+    "count": 1
+  }
+}
