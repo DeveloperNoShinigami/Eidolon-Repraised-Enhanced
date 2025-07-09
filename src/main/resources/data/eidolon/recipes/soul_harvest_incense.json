@@ -14,7 +14,7 @@
     {
       "items": [
         {
-          "item": "eidolon:shadow_gem"
+          "item": "eidolon:lesser_soul_gem"
         }
       ]
     },
@@ -29,6 +29,6 @@
   ],
   "result": {
     "item": "eidolon:soul_harvest_incense",
-    "count": 1
+    "count": 2
   }
 }

@@ -4,7 +4,7 @@
     {
       "items": [
         {
-          "item": "eidolon:ender_calx"
+          "item": "minecraft:lead"
         },
         {
           "item": "eidolon:avennian_sprig"
@@ -18,20 +18,21 @@
       "stirs": 1,
       "items": [
         {
-          "item": "eidolon:magicians_wax"
+          "item": "eidolon:warped_sprouts"
         }
       ]
     },
     {
       "items": [
         {
-          "item": "eidolon:merammer_resin"
+          "item": "eidolon:merammer_resin",
+          "count": 2
         }
       ]
     }
   ],
   "result": {
     "item": "eidolon:tether_incense",
-    "count": 1
+    "count": 2
   }
 }

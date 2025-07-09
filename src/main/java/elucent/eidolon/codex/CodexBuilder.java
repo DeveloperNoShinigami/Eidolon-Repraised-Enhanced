@@ -24,7 +24,12 @@ public class CodexBuilder {
     }
 
     public CodexBuilder titlePage(String textKey) {
-        pages.add(new TitlePage(textKey));
+        addTextPages(textKey, ItemStack.EMPTY, true);
+        return this;
+    }
+
+    public CodexBuilder titlePage(String textKey, ItemStack reference) {
+        addTextPages(textKey, reference, true);
         return this;
     }
 
@@ -119,6 +124,11 @@ public class CodexBuilder {
     }
 
     public CodexBuilder textPage(String translationKey) {
+        addTextPages(translationKey, ItemStack.EMPTY, false);
+        return this;
+    }
+
+    private void addTextPages(String translationKey, ItemStack icon, boolean isTitlePage) {
         Component text = Component.translatable(translationKey);
         String rawText = text.getString();
         String[] sentences = rawText.split("(?<=[.!?])\\s+");
@@ -127,31 +137,27 @@ public class CodexBuilder {
 
         // Wrap sentences into lines
         for (String sentence : sentences) {
-            List<String> sentenceLines = wrapTextToLines(sentence, 120);// 120 is max width in TextPage#render
+            List<String> sentenceLines = wrapTextToLines(sentence, 120); // wrap width
             lines.addAll(sentenceLines);
         }
 
-        // Now add pages based on the number of lines and the maximum lines per page
-        int linesPerPage = 13;
+        int linesPerPage = isTitlePage ? 12 : 13; // slightly fewer lines if there's a title
         int totalLines = lines.size();
         int pagesNeeded = (int) Math.ceil((double) totalLines / linesPerPage);
 
-        // Add pages to the CodexBuilder
         for (int i = 0; i < pagesNeeded; i++) {
             int startLine = i * linesPerPage;
             int endLine = Math.min((i + 1) * linesPerPage, totalLines);
-
-            // Extract the lines for this page
             List<String> pageLines = lines.subList(startLine, endLine);
+            String pageText = String.join(" ", pageLines);
 
-            // Convert lines to a format for rendering
-            String pageText = String.join(" ", pageLines);  // Join lines with space
-
-            // Add a text page for this portion of the text
-            pages.add(new TextPage(pageText));
+            if (i == 0 && isTitlePage) {
+                // add only the first one as a title page
+                pages.add(icon.isEmpty() ? new TitlePage(pageText, translationKey + ".title") : new TitlePage(pageText, icon));
+            } else {
+                pages.add(new TextPage(pageText));
+            }
         }
-
-        return this;
     }
 
 }

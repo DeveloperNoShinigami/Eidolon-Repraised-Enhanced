@@ -8,10 +8,13 @@
       "item": "eidolon:avennian_sprig"
     },
     {
+      "item": "eidolon:sildran_seed"
+    },
+    {
       "item": "minecraft:iron_nugget"
     },
     {
-      "item": "eidolon:magicians_wax"
+      "item": "minecraft:amethyst_cluster"
     }
   ],
   "result": {
