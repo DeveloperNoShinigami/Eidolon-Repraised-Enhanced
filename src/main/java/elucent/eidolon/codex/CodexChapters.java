@@ -113,9 +113,14 @@ public class CodexChapters {
             PLANTS = new CodexBuilder()
                     .title("eidolon.codex.chapter.plants")
                     .titlePage("eidolon.codex.page.plants")
-                    .textPage("eidolon.codex.page.plants.1")
                     .worktablePage(Registry.ATHAME.get())
+                    .titlePage("eidolon.codex.page.plants.planter", new ItemStack(Registry.PLANTER.get()))
                     .worktablePage(Registry.PLANTER.get())
+                    .titlePage("eidolon.codex.page.plants.oanna", new ItemStack(Registry.OANNA_BLOOM.get()))
+                    .titlePage("eidolon.codex.page.plants.mirecap", new ItemStack(Registry.MIRECAP.get()))
+                    .titlePage("eidolon.codex.page.plants.sildran", new ItemStack(Registry.SILDRIAN_SEED.get()))
+                    .titlePage("eidolon.codex.page.plants.avenna", new ItemStack(Registry.AVENNIAN_SPRIG.get()))
+                    .titlePage("eidolon.codex.page.plants.merammer", new ItemStack(Registry.MERAMMER_ROOT.get()))
                     .craftingPage(Registry.MERAMMER_RESIN.get())
                     .build();
 
@@ -530,8 +535,7 @@ public class CodexChapters {
                             new IndexEntry(WARPED_SPROUTS, new ItemStack(Registry.WARPED_SPROUTS.get())),
                             new IndexEntry(INLAYS, new ItemStack(Registry.GOLD_INLAY.get())),
                             new IndexEntry(BASIC_BAUBLES, new ItemStack(Registry.BASIC_RING.get())),
-                            new IndexEntry(MAGIC_WORKBENCH, new ItemStack(Registry.WORKTABLE.get())),
-                            new IndexEntry(VOID_AMULET, new ItemStack(Registry.VOID_AMULET.get()))
+                            new IndexEntry(MAGIC_WORKBENCH, new ItemStack(Registry.WORKTABLE.get()))
                     ),
                     new IndexPage(
                             new IndexEntry(WARDED_MAIL, new ItemStack(Registry.WARDED_MAIL.get())),
@@ -552,6 +556,7 @@ public class CodexChapters {
                             new IndexEntry(SOULBONE, new ItemStack(Registry.SOULBONE_AMULET.get()))
                     ),
                     new IndexPage(
+                            new IndexEntry(VOID_AMULET, new ItemStack(Registry.VOID_AMULET.get())),
                             new IndexEntry(RAVEN_CLOAK, new ItemStack(Registry.RAVEN_CLOAK.get())),
                             new IndexEntry(NECROMANCER_STAFF, new ItemStack(Registry.SUMMONING_STAFF.get())),
                             new IndexEntry(ARROW_RING, new ItemStack(Registry.ANGELS_SIGHT.get()))

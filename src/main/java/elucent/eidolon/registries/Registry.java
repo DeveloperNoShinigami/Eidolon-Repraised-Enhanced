@@ -178,19 +178,19 @@ public class Registry {
     public static final RegistryObject<Item> ARCANE_GOLD_NUGGET = addItem("arcane_gold_nugget");
     public static final RegistryObject<Item> ELDER_BRICK = addItem("elder_brick");
     public static final RegistryObject<Item> OFFERING_INCENSE = addItem("offering_incense", "lore.eidolon.offering_incense");
-    public static final RegistryObject<Item> RESTORATION_INCENSE = addItem("restoration_incense");
-    public static final RegistryObject<Item> GLOOM_INCENSE = addItem("gloom_incense");
-    public static final RegistryObject<Item> DEATH_BANE_INCENSE = addItem("deathbane_incense");
-    public static final RegistryObject<Item> TOUGH_INCENSE = addItem("tough_incense");
-    public static final RegistryObject<Item> FRAIL_INCENSE = addItem("frail_incense");
-    public static final RegistryObject<Item> FROSTBIND_INCENSE = addItem("frostbind_incense");
-    public static final RegistryObject<Item> TETHER_INCENSE = addItem("tether_incense");
-    public static final RegistryObject<Item> PURITY_INCENSE = addItem("purity_incense");
-    public static final RegistryObject<Item> QUICKEN_INCENSE = addItem("quicken_incense");
-    public static final RegistryObject<Item> BLOODLUST_INCENSE = addItem("bloodlust_incense");
-    public static final RegistryObject<Item> SOUL_HARVEST_INCENSE = addItem("soul_harvest_incense");
-    public static final RegistryObject<Item> WARDING_INCENSE = addItem("warding_incense");
-    public static final RegistryObject<Item> UNDEATH_INCENSE = addItem("undeath_incense");
+    public static final RegistryObject<Item> RESTORATION_INCENSE = addItem("restoration_incense", "lore.eidolon.restoration_incense");
+    public static final RegistryObject<Item> GLOOM_INCENSE = addItem("gloom_incense", "lore.eidolon.gloom_incense");
+    public static final RegistryObject<Item> DEATH_BANE_INCENSE = addItem("deathbane_incense", "lore.eidolon.deathbane_incense");
+    public static final RegistryObject<Item> TOUGH_INCENSE = addItem("tough_incense", "lore.eidolon.tough_incense");
+    public static final RegistryObject<Item> FRAIL_INCENSE = addItem("frail_incense", "lore.eidolon.frail_incense");
+    public static final RegistryObject<Item> FROSTBIND_INCENSE = addItem("frostbind_incense", "lore.eidolon.frostbind_incense");
+    public static final RegistryObject<Item> TETHER_INCENSE = addItem("tether_incense", "lore.eidolon.tether_incense");
+    public static final RegistryObject<Item> PURITY_INCENSE = addItem("purity_incense", "lore.eidolon.purity_incense");
+    public static final RegistryObject<Item> QUICKEN_INCENSE = addItem("quicken_incense", "lore.eidolon.quicken_incense");
+    public static final RegistryObject<Item> BLOODLUST_INCENSE = addItem("bloodlust_incense", "lore.eidolon.bloodlust_incense");
+    public static final RegistryObject<Item> SOUL_HARVEST_INCENSE = addItem("soul_harvest_incense", "lore.eidolon.soul_harvest_incense");
+    public static final RegistryObject<Item> WARDING_INCENSE = addItem("warding_incense", "lore.eidolon.warding_incense");
+    public static final RegistryObject<Item> UNDEATH_INCENSE = addItem("undeath_incense", "lore.eidolon.undeath_incense");
     public static final RegistryObject<Item> SULFUR = addItem("sulfur");
     public static final RegistryObject<Item> GOLD_INLAY = addItem("gold_inlay");
     public static final RegistryObject<Item> ZOMBIE_HEART = addItem("zombie_heart", () -> new ItemBase(itemProps().rarity(Rarity.UNCOMMON).food(
@@ -312,15 +312,13 @@ public class Registry {
     public static final RegistryObject<Item> RED_CANDY = addItem("red_candy", () -> new ItemBase(itemProps().rarity(Rarity.COMMON).food(
             new FoodProperties.Builder()
                     .nutrition(2).saturationMod(2)
+                    .effect(() -> new MobEffectInstance(EidolonPotions.SOUL_HARVEST.get(), 20 * 60, 0), 0.5f)
                     .build())).setLore(ChatFormatting.RED, "lore.eidolon.red_candy"));
-    public static final RegistryObject<Item> GRAPE_CANDY;
-
-    static {
-        GRAPE_CANDY = addItem("grape_candy", () -> new ItemBase(itemProps().rarity(Rarity.COMMON).food(
-                new FoodProperties.Builder()
-                        .nutrition(2).saturationMod(2)
-                        .build())).setLore(ChatFormatting.LIGHT_PURPLE, "lore.eidolon.grape_candy"));
-    }
+    public static final RegistryObject<Item> GRAPE_CANDY = addItem("grape_candy", () -> new ItemBase(itemProps().rarity(Rarity.COMMON).food(
+            new FoodProperties.Builder()
+                    .nutrition(2).saturationMod(2)
+                    .effect(() -> new MobEffectInstance(EidolonPotions.SOUL_HARVEST.get(), 20 * 60, 0), 0.5f)
+                    .build())).setLore(ChatFormatting.LIGHT_PURPLE, "lore.eidolon.grape_candy"));
 
     public static final RegistryObject<Block>
             LEAD_ORE = addBlock("lead_ore", blockProps(Blocks.STONE)

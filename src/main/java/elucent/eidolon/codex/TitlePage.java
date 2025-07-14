@@ -5,6 +5,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.jetbrains.annotations.NotNull;
@@ -13,11 +14,25 @@ public class TitlePage extends Page {
     public static final ResourceLocation BACKGROUND = new ResourceLocation(Eidolon.MODID, "textures/gui/codex_title_page.png");
     final String text;
     final String title;
+    ItemStack reference = ItemStack.EMPTY;
 
     public TitlePage(String textKey) {
         super(BACKGROUND);
         this.text = textKey;
         this.title = textKey + ".title";
+    }
+
+    public TitlePage(String textKey, String titleKey) {
+        super(BACKGROUND);
+        this.text = textKey;
+        this.title = titleKey;
+    }
+
+    public TitlePage(String textKey, ItemStack reference) {
+        super(BACKGROUND);
+        this.text = textKey;
+        this.title = reference.getDescriptionId();
+        this.reference = reference;
     }
 
     @Override

@@ -36,8 +36,8 @@ public class ScriptoriumContainer extends AbstractContainerMenu {
     public ScriptoriumContainer(int id, Inventory playerInventory, ContainerLevelAccess access) {
         super(Registry.SCRIPTORIUM_CONTAINER.get(), id);
         this.access = access;
-        this.addSlot(new NotesSlot(inventory, 0, 200, 28));
-        this.addSlot(new NotesSlot(inventory, 1, 200, 51));
+        this.addSlot(new NotesSlot(inventory, 0, -30, 33));
+        this.addSlot(new NotesSlot(inventory, 1, -30, 56));
 
         for (int k = 0; k < 3; ++k) {
             for (int i1 = 0; i1 < 9; ++i1) {
@@ -134,7 +134,8 @@ public class ScriptoriumContainer extends AbstractContainerMenu {
             ItemStack stack2 = this.slots.get(1).getItem().copy();
             // check if the itemstack is empty or if it is the same as the current chant
             if (stack2.isEmpty() || (stack2.getCount() < stack2.getMaxStackSize() && ChantScrollItem.getSpell(stack2).equals(currentChant))) {
-                ItemStack stack = this.slots.get(0).remove(1);
+                this.slots.get(0).remove(1);
+                ItemStack stack = Registry.CHANT_SCROLL.get().getDefaultInstance();
                 if (stack2.isEmpty()) {
                     ChantScrollItem.setSpell(stack, currentChant);
                     stack2 = stack;

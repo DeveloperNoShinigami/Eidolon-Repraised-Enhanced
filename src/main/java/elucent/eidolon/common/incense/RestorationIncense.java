@@ -1,7 +1,10 @@
 package elucent.eidolon.common.incense;
 
 import elucent.eidolon.api.ritual.IncenseRitual;
+import elucent.eidolon.client.particle.Particles;
+import elucent.eidolon.registries.EidolonParticles;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
@@ -28,7 +31,7 @@ public class RestorationIncense extends IncenseRitual {
             Level level = censer.getLevel();
             BlockPos pos = censer.getBlockPos();
             assert level != null;
-            for (LivingEntity entity : level.getEntitiesOfClass(LivingEntity.class, new AABB(pos).inflate(10))) {
+            for (LivingEntity entity : level.getEntitiesOfClass(LivingEntity.class, new AABB(pos).inflate(range()))) {
                 if (entity.getMobType() == MobType.UNDEAD) {
                     entity.addEffect(new MobEffectInstance(MobEffects.WITHER, 20 * 10, 1));
                 } else {
@@ -38,4 +41,28 @@ public class RestorationIncense extends IncenseRitual {
         }
     }
 
+    @Override
+    public void animateParticles(int burnCounter, BlockPos blockPos, Level level) {
+        super.animateParticles(burnCounter, blockPos, level);
+        double x = blockPos.getX();
+        double y = blockPos.getY() + 1;
+        double z = blockPos.getZ();
+
+        if (level.random.nextInt(5) == 0) Particles.create(EidolonParticles.SMOKE_PARTICLE)
+                .setAlpha(0.25f, 0).setScale(0.375f, 0.125f).setLifetime(160)
+                .randomOffset(range() * 0.5, 0.125).randomVelocity(0.025f, 0.025f)
+                .addVelocity(0, 0.0125f, 0)
+                .setColor(0.75f, 0.5f, 0.5f, 0.25f, 0.25f, 0.25f)
+                .spawn(level, x, y + 0.125, z);
+
+        if (level.random.nextInt(8) == 0)
+            for (int i = 0; i < 3; i++) {
+                Particles.spawnParticle(level, ParticleTypes.HEART,
+                        x, y - .5, z,
+                        0, -0.01, 0,
+                        range(), 0, range());
+            }
+
+
+    }
 }

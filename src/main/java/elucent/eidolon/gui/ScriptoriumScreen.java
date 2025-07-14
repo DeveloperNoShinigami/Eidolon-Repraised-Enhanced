@@ -50,14 +50,14 @@ public class ScriptoriumScreen extends AbstractContainerScreen<ScriptoriumContai
         bookTop = height / 2 - FULL_HEIGHT / 2;
         bookRight = width / 2 + FULL_WIDTH / 2;
         bookBottom = height / 2 + FULL_HEIGHT / 2;
-        currentChant = new ArrayList<>();
+        currentChant = new ArrayList<>(7);
         layoutSigns();
-        addRenderableWidget(new ChantButton(bookRight - 22, bookTop + 6, 32, 32, (b) -> {
+        addRenderableWidget(new ChantButton(bookLeft, bookTop + 8, 32, 32, (b) -> {
             if (!currentChant.isEmpty()) {
                 Networking.sendToServer(new InscribePacket(this.menu.containerId, currentChant));
             }
         }));
-        addRenderableWidget(new CancelButton(bookRight - 22, bookTop + 6 + 32, 32, 32, (b) -> currentChant.clear()));
+        addRenderableWidget(new CancelButton(bookLeft, bookTop + 8 + 32, 32, 32, (b) -> currentChant.clear()));
     }
 
     @Override
@@ -76,7 +76,7 @@ public class ScriptoriumScreen extends AbstractContainerScreen<ScriptoriumContai
 
     public void drawBackgroundElements(GuiGraphics graphics) {
         graphics.blit(background, 32, 0, 0, 0, 200, FULL_HEIGHT, FULL_WIDTH, FULL_HEIGHT);
-        graphics.blit(background, 232, 67, 200, 92, 36, 56, FULL_WIDTH, FULL_HEIGHT);
+        graphics.blit(background, -2, 72, 200, 92, 36, 56, FULL_WIDTH, FULL_HEIGHT);
     }
 
     public void drawForegroundElements(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
@@ -106,7 +106,9 @@ public class ScriptoriumScreen extends AbstractContainerScreen<ScriptoriumContai
         int startY = bookTop - 15;
         for (int i = 0; i < signs.size(); i++) {
             Sign sign = signs.get(i);
-            SignButton button = new SignButton(startX + 8 + (i % 5) * 38, startY + 16 + (i / 5) * 40, 30, 30, sign, (b) -> currentChant.add(sign));
+            SignButton button = new SignButton(startX + 8 + (i % 5) * 38, startY + 16 + (i / 5) * 40, 30, 30, sign, (b) -> {
+                if (currentChant.size() < 7) currentChant.add(sign);
+            });
             signButtons.add(button);
             addRenderableWidget(button);
         }

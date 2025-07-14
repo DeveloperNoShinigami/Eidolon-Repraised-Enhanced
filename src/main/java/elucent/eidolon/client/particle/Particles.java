@@ -1,9 +1,14 @@
 package elucent.eidolon.client.particle;
 
+import elucent.eidolon.api.spells.Rune;
 import elucent.eidolon.network.GenericParticlePacket;
 import elucent.eidolon.network.Networking;
+import elucent.eidolon.registries.EidolonParticles;
+import elucent.eidolon.registries.Runes;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.registries.RegistryObject;
@@ -11,6 +16,25 @@ import net.minecraftforge.registries.RegistryObject;
 import java.util.Random;
 
 public class Particles {
+
+    // variant of ParticleBuilder#Spawn that takes all parameters at once without using the builder
+    public static void spawnParticle(Level world, ParticleOptions type, double x, double y, double z,
+                                     double maxXSpeed, double maxYSpeed, double maxZSpeed, double maxXDist, double maxYDist, double maxZDist
+    ) {
+        double yaw = Math.random() * Math.PI * 2, pitch = Math.random() * Math.PI - Math.PI / 2,
+                xSpeed = Math.random() * maxXSpeed, ySpeed = Math.random() * maxYSpeed, zSpeed = Math.random() * maxZSpeed;
+        double vx = Math.sin(yaw) * Math.cos(pitch) * xSpeed;
+        double vy = Math.sin(pitch) * ySpeed;
+        double vz = Math.cos(yaw) * Math.cos(pitch) * zSpeed;
+        double yaw2 = Math.random() * Math.PI * 2, pitch2 = Math.random() * Math.PI - Math.PI / 2,
+                xDist = Math.random() * maxXDist, yDist = Math.random() * maxYDist, zDist = Math.random() * maxZDist;
+        double dx = Math.sin(yaw2) * Math.cos(pitch2) * xDist;
+        double dy = Math.sin(pitch2) * yDist;
+        double dz = Math.cos(yaw2) * Math.cos(pitch2) * zDist;
+        world.addParticle(type, x + dx, y + dy, z + dz, vx, vy, vz);
+    }
+
+
     public static class ParticleBuilder {
         static final Random random = new Random();
 
@@ -52,8 +76,14 @@ public class Particles {
         }
 
         public ParticleBuilder setColor(float r1, float g1, float b1, float a1, float r2, float g2, float b2, float a2) {
-            data.r1 = r1; data.g1 = g1; data.b1 = b1; data.a1 = a1;
-            data.r2 = r2; data.g2 = g2; data.b2 = b2; data.a2 = a2;
+            data.r1 = r1;
+            data.g1 = g1;
+            data.b1 = b1;
+            data.a1 = a1;
+            data.r2 = r2;
+            data.g2 = g2;
+            data.b2 = b2;
+            data.a2 = a2;
             return this;
         }
 
@@ -149,12 +179,12 @@ public class Particles {
 
         public ParticleBuilder spawn(Level world, double x, double y, double z) {
             double yaw = random.nextFloat() * Math.PI * 2, pitch = random.nextFloat() * Math.PI - Math.PI / 2,
-                xSpeed = random.nextFloat() * maxXSpeed, ySpeed = random.nextFloat() * maxYSpeed, zSpeed = random.nextFloat() * maxZSpeed;
+                    xSpeed = random.nextFloat() * maxXSpeed, ySpeed = random.nextFloat() * maxYSpeed, zSpeed = random.nextFloat() * maxZSpeed;
             this.vx += Math.sin(yaw) * Math.cos(pitch) * xSpeed;
             this.vy += Math.sin(pitch) * ySpeed;
             this.vz += Math.cos(yaw) * Math.cos(pitch) * zSpeed;
             double yaw2 = random.nextFloat() * Math.PI * 2, pitch2 = random.nextFloat() * Math.PI - Math.PI / 2,
-                xDist = random.nextFloat() * maxXDist, yDist = random.nextFloat() * maxYDist, zDist = random.nextFloat() * maxZDist;
+                    xDist = random.nextFloat() * maxXDist, yDist = random.nextFloat() * maxYDist, zDist = random.nextFloat() * maxZDist;
             this.dx = Math.sin(yaw2) * Math.cos(pitch2) * xDist;
             this.dy = Math.sin(pitch2) * yDist;
             this.dz = Math.cos(yaw2) * Math.cos(pitch2) * zDist;
@@ -168,7 +198,7 @@ public class Particles {
         }
 
         public ParticleBuilder repeat(Level world, double x, double y, double z, int n) {
-            for (int i = 0; i < n; i ++) spawn(world, x, y, z);
+            for (int i = 0; i < n; i++) spawn(world, x, y, z);
             return this;
         }
     }
@@ -178,6 +208,43 @@ public class Particles {
     }
 
     public static ParticleBuilder create(RegistryObject<?> type) {
-        return new ParticleBuilder((ParticleType<?>)type.get());
+        return new ParticleBuilder((ParticleType<?>) type.get());
     }
+
+    public static ParticleBuilder createRune(ResourceLocation id) {
+        return new RuneParticleBuilder(EidolonParticles.RUNE_PARTICLE.get(), id);
+    }
+
+    public static class RuneParticleBuilder extends ParticleBuilder {
+        Rune rune;
+
+        public RuneParticleBuilder(ParticleType<?> type, ResourceLocation id) {
+            super(type);
+            rune = Runes.find(id);
+        }
+
+        @Override
+        public ParticleBuilder spawn(Level world, double x, double y, double z) {
+            var rData = new RuneParticleData(rune, data.r1, data.g1, data.b1, data.r2, data.b2, data.g2);
+            double yaw = random.nextFloat() * Math.PI * 2, pitch = random.nextFloat() * Math.PI - Math.PI / 2,
+                    xSpeed = random.nextFloat() * maxXSpeed, ySpeed = random.nextFloat() * maxYSpeed, zSpeed = random.nextFloat() * maxZSpeed;
+            this.vx += Math.sin(yaw) * Math.cos(pitch) * xSpeed;
+            this.vy += Math.sin(pitch) * ySpeed;
+            this.vz += Math.cos(yaw) * Math.cos(pitch) * zSpeed;
+            double yaw2 = random.nextFloat() * Math.PI * 2, pitch2 = random.nextFloat() * Math.PI - Math.PI / 2,
+                    xDist = random.nextFloat() * maxXDist, yDist = random.nextFloat() * maxYDist, zDist = random.nextFloat() * maxZDist;
+            this.dx = Math.sin(yaw2) * Math.cos(pitch2) * xDist;
+            this.dy = Math.sin(pitch2) * yDist;
+            this.dz = Math.cos(yaw2) * Math.cos(pitch2) * zDist;
+
+            if (world instanceof ServerLevel level) {
+                Networking.sendToTracking(level, BlockPos.containing(x, y, z), new GenericParticlePacket(x + dx, y + dy, z + dz, vx, vy, vz, rData));
+            } else {
+                world.addParticle(rData, x + dx, y + dy, z + dz, vx, vy, vz);
+            }
+            return this;
+        }
+    }
+
+
 }

@@ -42,6 +42,17 @@ public class Runes {
                 return RuneResult.FAIL;
             }
         });
-
+        register(new Rune(new ResourceLocation(Eidolon.MODID, "wing")) {
+            @Override
+            public RuneResult doEffect(SignSequence seq) {
+                return RuneResult.PASS;
+            }
+        });
+        register(new Rune(new ResourceLocation(Eidolon.MODID, "purity")) {
+            @Override
+            public RuneResult doEffect(SignSequence seq) {
+                return RuneResult.PASS;
+            }
+        });
     }
 }

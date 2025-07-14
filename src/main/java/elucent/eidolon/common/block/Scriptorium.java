@@ -31,10 +31,9 @@ public class Scriptorium extends HorizontalBlockBase implements EntityBlock {
         if (worldIn.isClientSide) {
             return InteractionResult.SUCCESS;
         } else {
-            if (worldIn.getBlockEntity(pos) instanceof ScriptoriumTile tile && player.getItemInHand(handIn).getItem() == Registry.CHANT_SCROLL.get()) {
+            if (worldIn.getBlockEntity(pos) instanceof ScriptoriumTile tile && player.getItemInHand(handIn).getItem() == Registry.PARCHMENT.get()) {
                 NetworkHooks.openScreen((ServerPlayer) player, new SimpleMenuProvider(tile, Component.translatable("eidolon.gui.scriptorium")), pos);
             }
-
             return InteractionResult.CONSUME;
         }
     }

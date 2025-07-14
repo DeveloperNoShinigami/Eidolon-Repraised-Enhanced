@@ -41,6 +41,7 @@ import net.minecraft.world.entity.monster.hoglin.HoglinBase;
 import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.vehicle.Boat;
+import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
@@ -220,9 +221,11 @@ public class Events {
         if (event.getSource().getEntity() != null && event.getSource().getEntity() instanceof LivingEntity source) {
             ItemStack held = source.getMainHandItem();
             if (!entity.level.isClientSide && (held.getItem() instanceof ReaperScytheItem || event.getSource().is(Registry.RITUAL_DAMAGE.key))
-                && entity.isInvertedHealAndHarm()) {
-                if (!(entity instanceof Player)) event.getDrops().clear();
+                    && entity.isInvertedHealAndHarm()) {
+                if (!(entity instanceof Player))
+                    event.getDrops().removeIf(i -> !(i.getItem().getItem() instanceof ArmorItem));
                 int looting = ForgeHooks.getLootingLevel(entity, source, event.getSource());
+                if (source.hasEffect(EidolonPotions.SOUL_HARVEST.get())) looting += 2;
                 ItemEntity drop = new ItemEntity(source.level, entity.getX(), entity.getY(), entity.getZ(),
                         new ItemStack(Registry.SOUL_SHARD.get(), source.level.random.nextInt(2 + looting)));
                 drop.setDefaultPickUpDelay();
@@ -372,7 +375,7 @@ public class Events {
 
         if (isWither) {
             if (event.getSource().getEntity() instanceof LivingEntity living
-                && living.getItemBySlot(EquipmentSlot.HEAD).getItem() instanceof WarlockRobesItem) {
+                    && living.getItemBySlot(EquipmentSlot.HEAD).getItem() instanceof WarlockRobesItem) {
                 event.setAmount(event.getAmount() * 1.5f);
                 living.heal(event.getAmount() / 2);
             }
@@ -403,6 +406,13 @@ public class Events {
             } else if (EntityUtil.isEnthralledBy(source, event.getEntity())) {
                 event.setCanceled(true);
             } else if (EntityUtil.sameMaster(event.getEntity(), source)) event.setCanceled(true);
+        }
+    }
+
+    @SubscribeEvent
+    public void onExpDrop(LivingExperienceDropEvent event) {
+        if (event.getAttackingPlayer() != null && event.getAttackingPlayer().hasEffect(EidolonPotions.SOUL_HARVEST.get())) {
+            event.setDroppedExperience(Mth.ceil(event.getDroppedExperience() * 1.25));
         }
     }
 

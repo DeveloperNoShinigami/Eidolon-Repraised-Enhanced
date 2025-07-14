@@ -1,8 +1,11 @@
 package elucent.eidolon.common.incense;
 
 import elucent.eidolon.api.ritual.IncenseRitual;
+import elucent.eidolon.client.particle.Particles;
+import elucent.eidolon.registries.EidolonParticles;
 import elucent.eidolon.registries.EidolonPotions;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
@@ -31,8 +34,31 @@ public class UndeathIncense extends IncenseRitual {
             Level level = censer.getLevel();
             BlockPos pos = censer.getBlockPos();
             assert level != null;
-            for (LivingEntity entity : level.getEntitiesOfClass(LivingEntity.class, new AABB(pos).inflate(10))) {
+            for (LivingEntity entity : level.getEntitiesOfClass(LivingEntity.class, new AABB(pos).inflate(range()))) {
                 entity.addEffect(new MobEffectInstance(EidolonPotions.UNDEATH_EFFECT.get(), 20 * 60 * 2, 0, true, false));
+            }
+        }
+    }
+
+    @Override
+    public void animateParticles(int burnCounter, BlockPos blockPos, Level level) {
+        super.animateParticles(burnCounter, blockPos, level);
+        double x = blockPos.getX();
+        double y = blockPos.getY();
+        double z = blockPos.getZ();
+
+        if (level.random.nextInt(4) == 0) {
+            Particles.create(EidolonParticles.SMOKE_PARTICLE)
+                    .setAlpha(0.35f, 0).setScale(0.375f, 0.125f).setLifetime(280)
+                    .randomOffset(range() * 0.75, 0.5).randomVelocity(0.025f, 0.025f)
+                    .addVelocity(0, -0.0125f, 0)
+                    .setColor(0.125f, 0.125f, 0.125f, 0.005f, 0.005f, 0.005f)
+                    .repeat(level, x, y + 0.125, z, 5);
+            for (int i = 0; i < 5; i++) {
+                Particles.spawnParticle(level, ParticleTypes.SOUL,
+                        x, y + .5, z,
+                        0, -0.01, 0,
+                        range(), 0, range());
             }
         }
     }

@@ -56,6 +56,10 @@ public abstract class IncenseRitual {
         return IncenseRegistry.getIncenseRitual(incenseRegistryName);
     }
 
+    protected int range() {
+        return 10;
+    }
+
     public float getRed() {
         return 1.0f;
     }
@@ -69,9 +73,11 @@ public abstract class IncenseRitual {
     }
 
     public void animateParticles(CenserTileEntity censer, int burnCounter) {
-        BlockPos pos = censer.getBlockPos();
-        Level level = censer.getLevel();
-        float x = pos.getX() + 0.5f, y = pos.getY() + 0.45f, z = pos.getZ() + 0.5f;
+        animateParticles(burnCounter, censer.getBlockPos(), censer.getLevel());
+    }
+
+    public void animateParticles(int burnCounter, BlockPos blockPos, Level level) {
+        float x = blockPos.getX() + 0.5f, y = blockPos.getY() + 0.45f, z = blockPos.getZ() + 0.5f;
         float r = getRed();
         float g = getGreen();
         float b = getBlue();

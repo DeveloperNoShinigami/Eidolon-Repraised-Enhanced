@@ -39,6 +39,11 @@ public class IndexPage extends Page {
             // Only add to the map if the icon is from this mod
             if (RegistryUtil.getRegistryName(icon.getItem()).getNamespace().equals(Eidolon.MODID))
                 CodexChapters.itemToEntryMap.put(icon.getItem(), this);
+            for (Page p : chapter.pages) {
+                if (p instanceof TitlePage t && !t.reference.isEmpty()) {
+                    CodexChapters.itemToEntryMap.put(t.reference.getItem(), this);
+                }
+            }
         }
 
         public IndexEntry(Chapter chapter, ItemStack icon, boolean alwaysRender) {
