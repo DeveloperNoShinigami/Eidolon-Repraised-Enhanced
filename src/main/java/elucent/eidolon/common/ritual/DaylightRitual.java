@@ -27,14 +27,13 @@ public class DaylightRitual extends Ritual {
     @Override
     public RitualResult tick(Level world, BlockPos pos) {
         if (world.getDayTime() % 24000 < 1000 || world.getDayTime() % 24000 >= 12000) {
-            if (!world.isClientSide) {
-                ((PrimaryLevelData) world.getLevelData()).setDayTime(world.getDayTime() + 100);
+            if (!world.isClientSide && world.getLevelData() instanceof PrimaryLevelData data) {
+                data.setDayTime(world.getDayTime() + 100);
                 for (ServerPlayer player : ((ServerLevel) world).players()) {
                     player.connection.send(new ClientboundSetTimePacket(world.getGameTime(), world.getDayTime(), world.getGameRules().getBoolean(GameRules.RULE_DAYLIGHT)));
                 }
             }
             return RitualResult.PASS;
-        }
-        else return RitualResult.TERMINATE;
+        } else return RitualResult.TERMINATE;
     }
 }
