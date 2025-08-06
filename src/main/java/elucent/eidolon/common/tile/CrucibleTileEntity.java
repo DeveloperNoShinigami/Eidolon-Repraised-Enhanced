@@ -148,6 +148,18 @@ public class CrucibleTileEntity extends TileEntityBase {
     }
 
 
+    public int getStirTicks() {
+        return stirTicks;
+    }
+
+    public int getStirs() {
+        return stirs;
+    }
+
+    public List<CrucibleStep> getSteps() {
+        return steps;
+    }
+
     @Override
     public InteractionResult onActivated(BlockState state, BlockPos pos, Player player, InteractionHand hand) {
         if (hand == InteractionHand.MAIN_HAND && level != null) {
@@ -164,17 +176,21 @@ public class CrucibleTileEntity extends TileEntityBase {
                 }
                 return InteractionResult.SUCCESS;
             } else if (player.getItemInHand(hand).isEmpty() && stirTicks == 0 && !this.steps.isEmpty()) {
-                stirs++;
-                stirTicks = 20;
-                if (!level.isClientSide) {
-                    level.playSound(null, pos, SoundEvents.GENERIC_SPLASH, SoundSource.BLOCKS, 1.0f, 1.0f);
-                    sync();
-                }
+                stir(pos);
                 return InteractionResult.SUCCESS;
             }
 
         }
         return InteractionResult.PASS;
+    }
+
+    public void stir(BlockPos pos) {
+        stirs++;
+        stirTicks = 20;
+        if (!level.isClientSide) {
+            level.playSound(null, pos, SoundEvents.GENERIC_SPLASH, SoundSource.BLOCKS, 1.0f, 1.0f);
+            sync();
+        }
     }
 
     @Override

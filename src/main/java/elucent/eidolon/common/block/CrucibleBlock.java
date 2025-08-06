@@ -7,6 +7,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.LiquidBlockContainer;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -53,5 +54,14 @@ public class CrucibleBlock extends BlockBase implements EntityBlock, LiquidBlock
             return true;
         }
         return false;
+    }
+
+    @Override
+    public void onNeighborChange(BlockState state, LevelReader level, BlockPos pos, BlockPos neighbor) {
+        super.onNeighborChange(state, level, pos, neighbor);
+        if (level.getBlockEntity(pos) instanceof CrucibleTileEntity crucibleTileEntity)
+            if (level.hasNeighborSignal(pos) && crucibleTileEntity.getStirTicks() == 0 && !crucibleTileEntity.getSteps().isEmpty()) {
+                crucibleTileEntity.stir(pos);
+            }
     }
 }
