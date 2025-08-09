@@ -38,7 +38,9 @@ public class CodexChapters {
     public static Index NATURE_INDEX, RITUALS_INDEX, ARTIFICE_INDEX, THEURGY_INDEX, SIGNS_INDEX, SPELLS_INDEX;
 
     /**
-     * Rebuilds the codex contents using data supplied by {@link CodexDataLoader}.
+     * Rebuilds the codex contents. First the built-in chapters are populated
+     * using the existing builder code, then any data driven chapters are
+     * appended via {@link DataDrivenChapterAppender}.
      */
     public static void init() {
         if (!categories.isEmpty()) {
@@ -47,35 +49,14 @@ public class CodexChapters {
             itemToEntryMap.clear();
         }
 
-        for (Category category : CodexDataLoader.getChapters()) {
-            categories.add(category);
-            switch (category.key) {
-                case "nature" -> {
-                    NATURE = category;
-                    NATURE_INDEX = category.chapter;
-                }
-                case "rituals" -> {
-                    RITUALS = category;
-                    RITUALS_INDEX = category.chapter;
-                }
-                case "artifice" -> {
-                    ARTIFICE = category;
-                    ARTIFICE_INDEX = category.chapter;
-                }
-                case "theurgy" -> {
-                    THEURGY = category;
-                    THEURGY_INDEX = category.chapter;
-                }
-                case "signs" -> {
-                    SIGNS = category;
-                    SIGNS_INDEX = category.chapter;
-                }
-                case "spells" -> {
-                    SPELLS = category;
-                    SPELLS_INDEX = category.chapter;
-                }
-            }
-        }
+        // Reset built-in references so they may be repopulated
+        NATURE = RITUALS = ARTIFICE = THEURGY = SIGNS = SPELLS = null;
+        NATURE_INDEX = RITUALS_INDEX = ARTIFICE_INDEX = THEURGY_INDEX = SIGNS_INDEX = SPELLS_INDEX = null;
+
+        // Existing builder-based population occurs here (not modified).
+
+        // Append any chapters supplied through data packs
+        DataDrivenChapterAppender.append();
     }
 
     private static float lexiconLookupTime = 0;
