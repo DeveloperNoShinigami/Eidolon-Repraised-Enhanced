@@ -38,9 +38,13 @@ public class CodexChapters {
     public static Index NATURE_INDEX, RITUALS_INDEX, ARTIFICE_INDEX, THEURGY_INDEX, SIGNS_INDEX, SPELLS_INDEX;
 
     /**
-     * Rebuilds the codex contents. First the built-in chapters are populated
-     * using the existing builder code, then any data driven chapters are
-     * appended via {@link DataDrivenChapterAppender}.
+     * Rebuilds the codex contents using data supplied by {@link CodexDataLoader}.
+     * <p>
+     * {@link CodexDataLoader} runs as a resource reload listener and parses all
+     * chapter JSON files before this method is invoked.  Calling {@code init}
+     * therefore clears any previously registered chapters and installs the
+     * freshly loaded, data‑driven chapters into the in‑game categories so the
+     * codex reflects datapack changes.
      */
     public static void init() {
         if (!categories.isEmpty()) {
