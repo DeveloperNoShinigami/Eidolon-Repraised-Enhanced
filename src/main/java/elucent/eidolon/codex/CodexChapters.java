@@ -175,4 +175,3 @@ public class CodexChapters {
         RenderSystem.enableDepthTest();
     }
 }
-
