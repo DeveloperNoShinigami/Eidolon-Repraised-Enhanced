@@ -1,0 +1,10 @@
+{
+  "category": "nature",
+  "title": "example.codex.chapter.sample",
+  "icon": "minecraft:book",
+  "pages": [
+    { "type": "title", "text": "example.codex.page.sample.title" },
+    { "type": "text",  "text": "example.codex.page.sample.body" },
+    { "type": "crafting", "recipe": "minecraft:book" }
+  ]
+}
