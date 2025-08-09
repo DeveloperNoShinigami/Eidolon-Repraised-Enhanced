@@ -13,6 +13,7 @@ import elucent.eidolon.network.Networking;
 import elucent.eidolon.proxy.ClientProxy;
 import elucent.eidolon.proxy.ISidedProxy;
 import elucent.eidolon.proxy.ServerProxy;
+import elucent.eidolon.codex.CodexDataLoader;
 import elucent.eidolon.registries.*;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.renderer.Sheets;
@@ -34,6 +35,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.RegisterGuiOverlaysEvent;
 import net.minecraftforge.client.gui.overlay.VanillaGuiOverlay;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.event.entity.SpawnPlacementRegisterEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
@@ -89,8 +91,13 @@ public class Eidolon {
         proxy.init();
         MinecraftForge.EVENT_BUS.register(this);
         MinecraftForge.EVENT_BUS.register(new Events());
+        MinecraftForge.EVENT_BUS.addListener(this::addReloadListeners);
 
         CompatHandler.initialize();
+    }
+
+    public void addReloadListeners(AddReloadListenerEvent event) {
+        event.addListener(new CodexDataLoader());
     }
 
     public void setup(final FMLCommonSetupEvent event) {
