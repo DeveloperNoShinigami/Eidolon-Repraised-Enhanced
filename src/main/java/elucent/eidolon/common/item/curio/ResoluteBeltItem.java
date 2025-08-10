@@ -32,7 +32,10 @@ public class ResoluteBeltItem extends EidolonCurio {
 
     @SubscribeEvent
     public static void onHurt(LivingHurtEvent event) {
-        if (event.getSource().getEntity() instanceof LivingEntity entity && CuriosApi.getCuriosHelper().findFirstCurio(event.getEntity(), Registry.RESOLUTE_BELT.get()).isPresent()) {
+        if (event.getSource().getEntity() instanceof LivingEntity entity && CuriosApi.getCuriosInventory(event.getEntity())
+            .resolve()
+            .flatMap(inv -> inv.findFirstCurio(Registry.RESOLUTE_BELT.get()))
+            .isPresent()) {
             Vec3 diff = event.getEntity().position().subtract(entity.position()).multiply(1, 0, 1).normalize();
             entity.knockback(0.8f, diff.x, diff.z);
             if (!entity.level.isClientSide)

@@ -20,7 +20,10 @@ public class TerminusMirrorItem extends EidolonCurio {
     @SubscribeEvent
     public static void onDamage(LivingAttackEvent event) {
         if (event.getEntity() instanceof Player) {
-            CuriosApi.getCuriosHelper().findFirstCurio(event.getEntity(), Registry.TERMINUS_MIRROR.get()).ifPresent((slots) -> {
+            CuriosApi.getCuriosInventory(event.getEntity())
+                .resolve()
+                .flatMap(inv -> inv.findFirstCurio(Registry.TERMINUS_MIRROR.get()))
+                .ifPresent(slots -> {
                 ItemStack stack = slots.stack();
                 if (event.getSource().getDirectEntity() instanceof Projectile) {
                     event.setCanceled(true);

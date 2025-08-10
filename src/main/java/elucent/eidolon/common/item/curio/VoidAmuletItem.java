@@ -42,7 +42,10 @@ public class VoidAmuletItem extends EidolonCurio {
     @SubscribeEvent
     public static void onDamage(LivingAttackEvent event) {
         if (event.getEntity() instanceof Player player) {
-            CuriosApi.getCuriosHelper().findFirstCurio(player, Registry.VOID_AMULET.get()).ifPresent((stack) -> {
+            CuriosApi.getCuriosInventory(player)
+                .resolve()
+                .flatMap(inv -> inv.findFirstCurio(Registry.VOID_AMULET.get()))
+                .ifPresent(stack -> {
                 if (getCooldown(stack.stack()) == 0) {
                     if (event.getSource().getDirectEntity() instanceof Projectile
                         || event.getSource().getDirectEntity() instanceof SpellProjectileEntity) {

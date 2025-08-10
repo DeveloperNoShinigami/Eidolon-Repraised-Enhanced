@@ -18,7 +18,10 @@ public class WardedMailItem extends ItemBase {
     @SubscribeEvent
     public static void onDamage(LivingAttackEvent event) {
         if (event.getSource().is(DamageTypeTags.WITCH_RESISTANT_TO)) {
-            CuriosApi.getCuriosHelper().findFirstCurio(event.getEntity(), Registry.WARDED_MAIL.get()).ifPresent((slots) -> {
+            CuriosApi.getCuriosInventory(event.getEntity())
+                .resolve()
+                .flatMap(inv -> inv.findFirstCurio(Registry.WARDED_MAIL.get()))
+                .ifPresent(slots -> {
 
                 event.setCanceled(true);
                 event.getEntity().hurt(new DamageSource(event.getEntity().damageSources().generic().typeHolder()), event.getAmount());

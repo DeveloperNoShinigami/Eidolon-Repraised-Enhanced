@@ -40,12 +40,15 @@ public interface IPlayerData {
 
     default ItemStack getWingsItem(Player player) {
         ItemStack[] result = new ItemStack[]{ItemStack.EMPTY};
-        CuriosApi.getCuriosHelper().getEquippedCurios(player).ifPresent((h) -> {
-            for (int i = 0; i < h.getSlots(); i ++) {
-                ItemStack s = h.getStackInSlot(i);
-                if (s.getItem() instanceof IWingsItem) {
-                    result[0] = s;
-                    break;
+        CuriosApi.getCuriosInventory(player).resolve().ifPresent(inv -> {
+            for (var handler : inv.getCurios().values()) {
+                var stacks = handler.getStacks();
+                for (int i = 0; i < stacks.getSlots(); i++) {
+                    ItemStack s = stacks.getStackInSlot(i);
+                    if (s.getItem() instanceof IWingsItem) {
+                        result[0] = s;
+                        return;
+                    }
                 }
             }
         });
