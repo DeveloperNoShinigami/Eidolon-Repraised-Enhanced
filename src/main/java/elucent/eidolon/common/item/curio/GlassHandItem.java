@@ -16,11 +16,17 @@ public class GlassHandItem extends ItemBase {
 
     @SubscribeEvent
     public static void onHurt(LivingHurtEvent event) {
-        if (CuriosApi.getCuriosHelper().findFirstCurio(event.getEntity(), Registry.GLASS_HAND.get()).isPresent()) {
+        if (CuriosApi.getCuriosInventory(event.getEntity())
+            .resolve()
+            .flatMap(inv -> inv.findFirstCurio(Registry.GLASS_HAND.get()))
+            .isPresent()) {
             event.setAmount(event.getAmount() * 5);
         }
         if (event.getSource().getEntity() instanceof LivingEntity living &&
-            CuriosApi.getCuriosHelper().findFirstCurio(living, Registry.GLASS_HAND.get()).isPresent()) {
+            CuriosApi.getCuriosInventory(living)
+                .resolve()
+                .flatMap(inv -> inv.findFirstCurio(Registry.GLASS_HAND.get()))
+                .isPresent()) {
             event.setAmount(event.getAmount() * 2);
         }
     }

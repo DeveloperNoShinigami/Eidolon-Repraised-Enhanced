@@ -67,8 +67,11 @@ public class AngelSightItem extends EidolonCurio {
     @SubscribeEvent
     public static void addMode(final EntityJoinLevelEvent event) {
         if (event.getEntity() instanceof Projectile projectile && projectile.getOwner() instanceof Player player) {
-            CuriosApi.getCuriosHelper().findFirstCurio(player, Registry.ANGELS_SIGHT.get()).ifPresent(ring -> {
-                Predicate<Entity> targetMode = switch (ring.stack().getOrCreateTag().getInt("mode")) {
+            CuriosApi.getCuriosInventory(player)
+                .resolve()
+                .flatMap(inv -> inv.findFirstCurio(Registry.ANGELS_SIGHT.get()))
+                .ifPresent(slot -> {
+                Predicate<Entity> targetMode = switch (slot.stack().getOrCreateTag().getInt("mode")) {
                     case 1 -> target -> target instanceof LivingEntity && !(target instanceof Player);
                     case 2 -> target -> target instanceof Enemy;
                     default -> target -> target instanceof LivingEntity;
